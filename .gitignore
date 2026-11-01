@@ -1,0 +1,6 @@
+*.asv
+*.avi
+*.mp4
+**/results/
+.DS_Store
+*.zip
