@@ -13,7 +13,7 @@ addpath(thisDir);
 
 rc = robotConfig();
 cfg = defaultConfig();
-cfg.fkMode       = 'PoE';            % switch to 'getTransform' until T3 is done
+cfg.fkMode       = 'getTransform';            % switch to 'getTransform' until T3 is done
 cfg.sphereRadius = rc.sphereRadius;
 cfg.outDir       = fullfile(thisDir, 'results');
 cfg.displayAnimation = false;
