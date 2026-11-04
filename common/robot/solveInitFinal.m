@@ -7,24 +7,33 @@ function [q0, qT, poseFinal] = solveInitFinal(model, scene)
 
 weights = [1 1 1 1 1 1];
 ik = inverseKinematics('RigidBodyTree', model.robot);
-ik.SolverParameters.AllowRandomRestart = false;
+ik.SolverParameters.AllowRandomRestart = true;
+rngState = rng;
+rng(0);
 
 %% Start
 if isfield(scene, 'q0') && ~isempty(scene.q0)
     q0 = scene.q0(:);
 else
-    q0 = ik(model.eeName, scene.taskInit, weights, homeConfiguration(model.robot));
+    [q0, ikInfo] = ik(model.eeName, scene.taskInit, weights, homeConfiguration(model.robot));   % NEW: 2 outputs
+    if ~strcmp(ikInfo.Status, 'success')                                                         % NEW
+        warning('solveInitFinal: start IK status "%s" (pose error %.4f)', ikInfo.Status, ikInfo.PoseErrorNorm);
+    end
 end
 
 %% Goal
 if isfield(scene, 'qT') && ~isempty(scene.qT)
     qT = scene.qT(:);
 else
-    qT = ik(model.eeName, scene.taskFinal, weights, q0);
+    [qT, ikInfo] = ik(model.eeName, scene.taskFinal, weights, q0);                               % NEW: 2 outputs
+    if ~strcmp(ikInfo.Status, 'success')                                                         % NEW
+        warning('solveInitFinal: goal IK status "%s" (pose error %.4f)', ikInfo.Status, ikInfo.PoseErrorNorm);
+    end
 end
 
+rng(rngState);
 %% Wrap continuous / revolute joints into [-pi, pi]
-%% TODO[T2-3] (Owner: T12) If the chosen robot has a PRISMATIC joint, do not wrap it.
+%% TODO[T2-3] (Owner: Joshua Lim) If the chosen robot has a PRISMATIC joint, do not wrap it.
 % Original code called wrapToPi on the whole vector, which is wrong for prismatic joints.
 isAngular = ~strcmp(model.jointTypes, 'prismatic')';
 q0(isAngular) = wrapToPi(q0(isAngular));
