@@ -19,15 +19,15 @@ T = cell(1, nFK);
 switch model.fkMode
     case 'getTransform'
         for k = 1:nFK
-            %% TODO[T1-2] (Owner: T12) Built-in FK with getTransform.
+            %% TODO[T1-2] (Owner: Joshua Lim) Built-in FK with getTransform.
             % - Pose of body model.fkBodyNames{k} w.r.t. the base frame.
             % - model.robot is DataFormat 'column', so getTransform can take `theta`
             %   directly -- no need to build a struct configuration like the original
             %   sample code did (that struct copy was a large part of the run time;
             %   worth one line in the report as an efficiency fix).
             % - Fill T{k} (4x4) and X(k,:) (1x4, the translation column of T{k}).
-            T{k} = eye(4);          % placeholder
-            X(k, :) = T{k}(:, 4)';  % keep this line once T{k} is correct
+            T{k} = getTransform(model.robot ,theta, model.fkBodyNames{k});          
+            X(k, :) = T{k}(:, 4)'; 
         end
 
     case 'PoE'
