@@ -18,12 +18,12 @@ theta_paths = cell(1, nSamplePaths);
 mu = zeros(1, length(sigma));
 
 for m = 1 : nJoints
-    %% TODO[T1-4] (Owner: T12) Independent sampling for each joint
+    %% TODO[T1-4] (Owner: Joshua Lim) Independent sampling for each joint
     % - Each joint is sampled independently from N(mu, sigma) (mvnrnd,
     %   Statistics & ML Toolbox) -> nSamplePaths x (nDiscretize-2).
     % - Start q0 and goal qT are fixed: pad a zero column on both sides so
     %   em{m} is nSamplePaths x nDiscretize.
-    em{m} = zeros(nSamplePaths, nDiscretize);   % placeholder
+    em{m} = [ zeros(nSamplePaths,1), mvnrnd(mu, sigma, nSamplePaths ) ,zeros(nSamplePaths,1)];  % placeholder
 end
 
 %% Regroup it by samples (unchanged)
@@ -33,3 +33,4 @@ for k = 1:nSamplePaths
     theta_paths{k} = theta + ek{k};
 end
 end
+
