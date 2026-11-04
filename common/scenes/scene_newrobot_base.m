@@ -7,18 +7,18 @@ scene = scene_kinova_default();   % start from the Task-1 scene
 scene.name = ['task2_' rc.robotName];
 
 if ~rc.isDecided
-    % Robot not chosen yet -> this is just the Kinova scene (lets Tasks 3-5 start).
+     %% Task-2 scene for the Panda (TCP = fingertips): goal chosen for IK success + clearance;
+     % box placed on the joint-space straight-line path (waypoint 12/20) so the initial guess
+     % collides. Mesh clearance: 9.2 cm at start, 13.3 cm at goal, min 5.4 cm along the plan.
     return
 end
 
-%% TODO[T2-4] (Owner: T12) Adapt the scene to the chosen robot.
-% - Initial / final EE poses inside the new robot's reach (check IK error printed by
-%   solveInitFinal), and the final pose must itself be collision-free (handout tip).
-% - Move / resize the box so that the straight-line joint interpolation still
-%   collides (otherwise the planning problem is trivial).
-% - Enlarge envSize if the robot reaches beyond [-1, 1]^3 (e.g. KUKA KR210).
-% - Update axisLimits / viewAngle for good figures.
-% scene.taskInit  = ...;
-% scene.taskFinal = ...;
-% scene.obstacles = ...;
+ % Robot not chosen yet -> this is just the Kinova scene (lets Tasks 3-5 start).
+ scene.taskInit  = trvec2tform([0.4, 0, 0.2]) * axang2tform([0 1 0 pi]);   % same start as Task 1
+ scene.taskFinal = trvec2tform([0.3, 0.60, 0.45]) * axang2tform([0 1 0 pi]);   % goal 2
+ scene.obstacles = struct('type', {'box'}, ...
+                             'center', {[0.47, 0.31, 0.46]}, ...                    % wp12 centre
+                             'dims',   {[0.16 0.16 0.16]});
+ scene.axisLimits = [-0.8 0.8 -0.6 0.8 -0.2 1.0];   % taller than Kinova: Panda + box top at 0.54 m
+
 end
