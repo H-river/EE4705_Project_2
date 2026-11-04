@@ -1,6 +1,6 @@
 %% Task 1 -- KINOVA Gen3 + STOMP, original collision-avoidance setting
 % Replaces KINOVA_STOMP_Path_Planning.m. Run this file from anywhere (F5).
-% Owner: T12
+% Owner: Joshua Lim
 %
 % Done when: the planned path is collision-free (isTrajectoryInCollision = 0) and the
 % animation plays, with getTransform FK.
@@ -20,8 +20,9 @@ cfg.outDir = fullfile(thisDir, 'results');
 model = buildRobotModel('kinovaGen3', 'EndEffector_Link', cfg.fkMode);
 scene = scene_kinova_default();
 
+rng(0);
 result = runPipeline(model, scene, cfg);
 
-%% TODO[T1-7] (Owner: T12) Report figures for Task 1 (once T5-3 plotting is ready):
+%% TODO[T1-7] (Owner: Joshua Lim) Report figures for Task 1 (once T5-3 plotting is ready):
 % plotConfigOverlay(model, result.theta, result.world, scene, struct('saveFile', fullfile(cfg.outDir,'task1_overlay.png')));
 % plotCostHistory({result}, {'Kinova, getTransform'}, fullfile(cfg.outDir,'task1_cost.png'));
