@@ -2,18 +2,23 @@ function [fig, stats] = plotEEAxisDeviation(results, model, cfg, labels, saveFil
 % PLOTEEAXISDEVIATION  Angle between the constrained EE axis and cfg.worldAxis along
 % each trajectory -- the main before/after figure of Task 5.
 %
+% Self-contained: no other project function is called. Toolbox functions used:
+%   Robotics System Toolbox : getTransform, tform2rotm
+%   MATLAB (base)           : atan2d, cross, dot, exportgraphics, legend, plot
+%
 % INPUT  results : 1 x K cell of result structs from runPipeline / runSTOMP
 %                  (a single struct is also accepted); uses .theta (nJoints x N)
-%         model  : from buildRobotModel
+%         model  : from buildRobotModel (uses .robot and .eeName)
 %         cfg    : uses cfg.eeAxis (default 2) and cfg.worldAxis (default [0;0;1])
 %         labels : (optional) 1 x K cell of legend strings
 %         saveFile: (optional) '' = do not save, e.g. fullfile(cfg.outDir,'task5_axis_dev.png')
 % OUTPUT fig     : figure handle
 %         stats  : 1 x K struct array with fields label, maxDeg, meanDeg, angDeg
-%                  (angDeg = 1 x N angles) -- for the report table
+%                  (angDeg = 1 x N angles in degrees) -- reused by main_task5 for the table
 %
 % Call (as in main_task5.m):
-%   plotEEAxisDeviation({resOff, resOn}, model, cfg, {'no constraint','with constraint'}, file)
+%   [fig, stats] = plotEEAxisDeviation({resOff, resOn}, model, cfg, ...
+%                      {'no constraint','with constraint'}, saveFile);
 %
 % Owner: T5
 
@@ -97,5 +102,24 @@ end
 %% Save
 if ~isempty(saveFile)
     exportgraphics(fig, saveFile, 'Resolution', 200);
+end
+end
+
+
+function ang = eeAxisAngles(model, theta, eeAxis, worldAxis)
+% EEAXISANGLES  Angle [deg] between one EE body axis and a world axis, per waypoint.
+% Uses the toolbox's getTransform directly, so it is independent of cfg.fkMode and of
+% the Task 1-4 forward-kinematics code.
+%   theta : nJoints x N      ang : 1 x N   (0 = aligned, 180 = opposite)
+w = worldAxis(:) / norm(worldAxis);
+N = size(theta, 2);
+ang = zeros(1, N);
+for t = 1:N
+    T = getTransform(model.robot, theta(:, t), model.eeName);   % Robotics System Toolbox, 'column' format
+    R = tform2rotm(T);                  % 3x3 rotation block of the 4x4 pose
+    a = R(:, eeAxis);                   % column k of R = EE body axis k in the world frame
+    % atan2d(|a x w|, a . w) is the angle between the vectors. Unlike acosd(a'*w) it
+    % stays accurate for tiny angles, needs no clamping, and cannot return complex values.
+    ang(t) = atan2d(norm(cross(a, w)), dot(a, w));
 end
 end
