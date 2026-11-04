@@ -5,7 +5,7 @@ function rc = robotConfig()
 % Until Task 2 is decided this returns Kinova Gen3, so Tasks 3/4/5 can be
 % developed in parallel on a robot that is already known to work.
 
-%% TODO[T2-1] (Owner: T12) Choose the Task-2 robot and fill in the fields below.
+%% TODO[T2-1] (Owner: Joshua Lim) Choose the Task-2 robot and fill in the fields below.
 % - Built-in robots: see `help loadrobot` (e.g. 'universalUR5e', 'frankaEmikaPanda',
 %   'abbIrb120', 'kukaIiwa7', ...). Pick one whose geometry differs from Kinova
 %   (prismatic joint / fixed base links / different DOF are all "interesting").
@@ -14,11 +14,13 @@ function rc = robotConfig()
 % - rc.eeName must be the body that represents the tool / end-effector.
 % - After choosing, set rc.isDecided = true and tell T34 + T5 (screw axes and
 %   EE constraint depend on it).
-rc.robotName  = 'kinovaGen3';         % placeholder until Task 2 is decided
-rc.eeName     = 'EndEffector_Link';   % placeholder
-rc.isDecided  = false;
+rc.robotName  = 'frankaEmikaPanda';
+rc.eeName     = 'panda_tcp';
+rc.tcpParent  = 'panda_hand'; 
+rc.tcpOffset  = [0 0 0.1034];
+rc.isDecided  = true;
 
-%% TODO[T2-2] (Owner: T12) Collision-sphere radius for the chosen robot.
+%% TODO[T2-2] (Owner: Joshua Lim) Collision-sphere radius for the chosen robot.
 % Scalar = same radius for every link; vector (1 x nFK) = one radius per link
 % (row k covers the segment from frame k-1 to frame k, see stompRobotSphere).
 % Check visually with `show(robot)` that the spheres cover the links.
