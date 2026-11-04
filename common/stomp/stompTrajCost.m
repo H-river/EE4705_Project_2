@@ -49,6 +49,6 @@ Stheta = cfg.w_obs * qo_cost + cfg.w_con * qc_cost;
 
 % sum over time and add the smoothness cost
 thIn = theta(:, 2:end-1);
-%% TODO[T1-6b] (Owner: T12) Same cross-joint bug as in runSTOMP (see there).
-Qtheta = sum(Stheta) + 1/2 * sum(thIn * R * thIn', "all");
+%% TODO[T1-6b] (Owner: Joshua Lim) Same cross-joint bug as in runSTOMP (see there).
+Qtheta = sum(Stheta) + 1/2 * trace(thIn * R * thIn');
 end
