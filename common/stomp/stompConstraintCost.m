@@ -12,13 +12,21 @@ function c = stompConstraintCost(T_ee, cfg)
 %
 % Column k of the rotation block R = T_ee(1:3,1:3) is the EE body axis k (x, y, z)
 % expressed in the world frame, so
-%   y_sb = T_ee(1:3, 2)   is the EE y-axis in the world frame (unit vector).
+%   a = T_ee(1:3, eeAxis)   is the constrained EE axis in the world frame (unit vector).
 %
 % Cost options (all are 0 at perfect alignment and grow with the deviation):
-%   'l1'    c = || y_sb - worldAxis ||_1           handout Section 1.1, option 2 (default)
+%   'l1'    c = || a - worldAxis ||_1              handout Section 1.1, option 2 (default)
 %                                                  range [0, 2] for worldAxis = [0;0;1]
-%   'l2sq'  c = || y_sb - worldAxis ||_2^2         = 2 (1 - cos(angle)), smooth at 0
-%   'angle' c = acos( y_sb' * worldAxis )  [rad]   the actual deviation angle
+%   'l2sq'  c = || a - worldAxis ||_2^2            = 2 (1 - cos(angle)), smooth at 0
+%   'angle' c = atan2(||a x w||, a'w)  [rad]       the actual deviation angle
+%
+% Why no toolbox call in here (e.g. tform2rotm): this function is called once per
+% waypoint, per noisy sample, per STOMP iteration (nPaths * nDiscretize * nIter, i.e.
+% tens of thousands of calls per run). tform2rotm validates its input every call;
+% plain indexing T_ee(1:3,1:3) does the same job with no overhead and no dependency.
+% The toolbox helpers (tform2rotm, tform2trvec, getTransform) are used in the
+% analysis / plotting code (plotEEAxisDeviation, plotConfigOverlay, main_task5), which
+% runs once per figure -- there the readability is worth the overhead.
 %
 % Note: this only constrains the DIRECTION of one axis. The EE may still rotate freely
 % about that axis (a cup stays upright however it is spun). Penalising distance to a
@@ -26,36 +34,50 @@ function c = stompConstraintCost(T_ee, cfg)
 %
 % Owner: T5
 
-%% Defaults, so the function also works with a minimal cfg
-axisIdx = 2;
-if isfield(cfg, 'eeAxis') && ~isempty(cfg.eeAxis)
-    axisIdx = cfg.eeAxis;
-end
+%% Options with defaults, so the function also works with a minimal cfg
+axisIdx   = getOpt(cfg, 'eeAxis',         2);
+worldAxis = getOpt(cfg, 'worldAxis',      [0; 0; 1]);
+mode      = getOpt(cfg, 'constraintType', 'l1');
 
-worldAxis = [0; 0; 1];
-if isfield(cfg, 'worldAxis') && ~isempty(cfg.worldAxis)
-    worldAxis = cfg.worldAxis(:);
+%% Cheap input checks (a silent wrong axis would just give a plausible-looking cost)
+if ~isequal(size(T_ee), [4 4])
+    error('stompConstraintCost: T_ee must be a 4x4 pose, got %s.', mat2str(size(T_ee)));
 end
-worldAxis = worldAxis / norm(worldAxis);     % make sure it is a unit vector
-
-mode = 'l1';
-if isfield(cfg, 'constraintType') && ~isempty(cfg.constraintType)
-    mode = cfg.constraintType;
+if ~isscalar(axisIdx) || ~any(axisIdx == [1 2 3])
+    error('stompConstraintCost: cfg.eeAxis must be 1, 2 or 3.');
 end
+worldAxis = worldAxis(:);
+nW = norm(worldAxis);
+if numel(worldAxis) ~= 3 || nW == 0
+    error('stompConstraintCost: cfg.worldAxis must be a non-zero 3-vector.');
+end
+worldAxis = worldAxis / nW;                  % make sure it is a unit vector
 
 %% Constrained EE axis in the world frame
-y_sb = T_ee(1:3, axisIdx);
+a = T_ee(1:3, axisIdx);
+a = a / norm(a);                             % guards against round-off drift in R
 
 %% Orientation penalty
 switch lower(mode)
     case 'l1'
-        c = norm(y_sb - worldAxis, 1);
+        c = norm(a - worldAxis, 1);
     case 'l2sq'
-        c = sum((y_sb - worldAxis).^2);
+        c = sum((a - worldAxis).^2);
     case 'angle'
-        % clamp against round-off so acos never returns a complex number
-        c = acos(max(-1, min(1, y_sb' * worldAxis)));
+        % atan2 form: accurate for tiny angles, no clamping, never complex
+        % (same formula as plotEEAxisDeviation, so cost and plot agree).
+        c = atan2(norm(cross(a, worldAxis)), dot(a, worldAxis));
     otherwise
         error('stompConstraintCost: unknown cfg.constraintType "%s" (use l1 | l2sq | angle).', mode);
+end
+end
+
+
+function v = getOpt(s, name, default)
+% GETOPT  s.(name) if present and non-empty, otherwise the default.
+if isfield(s, name) && ~isempty(s.(name))
+    v = s.(name);
+else
+    v = default;
 end
 end
