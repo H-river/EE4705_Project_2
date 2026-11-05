@@ -29,44 +29,40 @@ iterTime = [];
 theta_animation = {theta};
 dtheta_smoothed = zeros(nDiscretize - 2, model.nJoints);
 
-iter = 0;
+nSmall = 0;      % consecutive iterations with |dQ| below the threshold
+iter   = 0;
 tTotal = tic;
-while abs(Qtheta - QthetaOld) > cfg.convergenceThreshold
+while true
     iter = iter + 1;
     QthetaOld = Qtheta;
     tIter = tic;
 
-    %% TODO[T1-1a] (Owner: T12) Sample noisy trajectories
-    % -> stompSamples(nPaths, sigma, theta) returns theta_paths (1 x nPaths cell) and em.
-    theta_paths = repmat({theta}, 1, nPaths);          % placeholder
-    em = repmat({zeros(nPaths, nDiscretize)}, 1, model.nJoints); % placeholder
+    %% (a) Sample noisy trajectories theta + eps, eps ~ N(0, sigma) per joint
+    [theta_paths, em] = stompSamples(nPaths, sigma, theta);
 
-    %% TODO[T1-1b] (Owner: T12) Local trajectory cost S(theta_k) of every sample
-    % -> loop k = 1:nPaths, Stheta(k,:) = stompTrajCost(model, theta_paths{k}, R, voxel_world, cfg)
-    % (Optional speed-up for the report: parfor over samples.)
+    %% (b) Local cost S(theta_k, i) of every sample at every waypoint
     Stheta = zeros(nPaths, nDiscretize);
+    for k = 1:nPaths
+        Stheta(k, :) = stompTrajCost(model, theta_paths{k}, R, voxel_world, cfg);
+    end
 
-    %% TODO[T1-1c] (Owner: T12) Per-time-step probabilities P(theta_k, i), Eq. (11)
-    % -> stompUpdateProb(Stheta, cfg.h)
-    trajProb = zeros(nPaths, nDiscretize);              % placeholder
+    %% (c) Per-waypoint probabilities P(theta_k, i), Eq. (11)
+    trajProb = stompUpdateProb(Stheta, cfg.h);
 
-    %% TODO[T1-1d] (Owner: T12) Gradient estimate and smoothed update
-    % -> stompDTheta(trajProb, em), then stompUpdateTheta(theta, dtheta, M)
-    %    (stompUpdateTheta returns both the new theta and dtheta_smoothed)
+    %% (d) Probability-weighted noise -> smoothed update of theta
+    dtheta = stompDTheta(trajProb, em);
+    [theta, dtheta_smoothed] = stompUpdateTheta(theta, dtheta, M);
 
-    %% TODO[T1-1e] (Owner: T12) Total cost of the updated trajectory
-    % -> [~, Qtheta] = stompTrajCost(model, theta, R, voxel_world, cfg);
+    %% (e) Total cost Q(theta) of the updated trajectory
+    [~, Qtheta] = stompTrajCost(model, theta, R, voxel_world, cfg);
 
     iterTime(end + 1) = toc(tIter); %#ok<AGROW>
 
     %% Logging
     Q_time(end + 1) = Qtheta; %#ok<AGROW>
     thIn = theta(:, 2:nDiscretize - 1);
-    %% TODO[T1-6b] (Owner: T12) BUG in original: sum(thIn*R*thIn','all') also adds the
-    % cross-joint terms th_i' R th_j (i ~= j). The control cost in the paper is
-    % sum_j th_j' R th_j = trace(thIn*R*thIn'). Same bug inside stompTrajCost.
-    % Fix both, and mention it in the report as a bug fix.
-    RAR = 1/2 * sum(thIn * R * thIn', 'all');
+    % Control cost = sum_j th_j' R th_j = trace (original summed cross-joint terms too)
+    RAR = 1/2 * trace(thIn * R * thIn');
     RAR_time(end + 1) = RAR; %#ok<AGROW>
     theta_animation{end + 1} = theta; %#ok<AGROW>
 
@@ -75,6 +71,18 @@ while abs(Qtheta - QthetaOld) > cfg.convergenceThreshold
     end
 
     %% Stopping criteria
+    % Patience rule: stop after cfg.convergencePatience CONSECUTIVE iterations with
+    % |dQ| < threshold (patience = 1 reproduces the original single-step rule).
+    if abs(Qtheta - QthetaOld) < cfg.convergenceThreshold
+        nSmall = nSmall + 1;
+    else
+        nSmall = 0;
+    end
+    if nSmall >= cfg.convergencePatience
+        fprintf('Converged: |dQ| < %.3g for %d consecutive iterations.\n', ...
+                cfg.convergenceThreshold, nSmall);
+        break
+    end
     if iter >= cfg.maxIter
         fprintf('Maximum iteration (%d) reached.\n', cfg.maxIter);
         break
@@ -97,5 +105,4 @@ result.totalTime       = toc(tTotal);
 result.q0 = q0;
 result.qT = qT;
 disp('STOMP Finished.');
-
 end

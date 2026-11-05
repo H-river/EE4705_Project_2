@@ -16,7 +16,7 @@ T5-3 画图函数 ──► 所有 Task 的报告图
 - **不会被卡**：Task 3 先在 Kinova 上原型（`main_task3.m` 里 `useKinova = true`）；Task 5 的 `stompConstraintCost` 和画图函数可以先写。
 - **T2-1 尽早定**：定了就在 `robotConfig.m` 里改 `isDecided = true`，并在群里通知。
 
-## Task 1+2（T12，约 11 h）
+## Task 1+2（Joshua Lim，约 11 h）
 | 编号 | 文件 | 内容 | 状态 |
 |---|---|---|---|
 | T1-1a–e | `common/stomp/runSTOMP.m` | 主循环：采样 → 局部代价 → 概率 → dθ 并更新 → 新代价 | ⬜ |

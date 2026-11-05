@@ -70,7 +70,7 @@ Bug fixes (to be completed / confirmed — see `TODO.md`, section "Bug fixes"):
 ## Team
 | Member | Tasks |
 |---|---|
-| T12 owner | Task 1, Task 2, framework, README, clean-environment reproduction check |
+| Joshua Lim | Task 1, Task 2, framework, README, clean-environment reproduction check |
 | Hu Jiamo | Task 3 (PoE), Task 4 (scenarios, multi-obstacle voxelisation) |
 | T5 owner | Task 5, shared plotting functions, report and slides integration |
 
