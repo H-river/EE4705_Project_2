@@ -95,7 +95,8 @@ else
     warning(['No weight is collision-free on all seeds AND below %g deg tilt. ' ...
              'Falling back to the lowest-tilt weight among those with the best collision-free rate. ' ...
              'Consider a larger wList, more iterations, or a different tolerance.'], tiltTolDeg);
-    cand = find((okRate == max(okRate)) & (wList(:) > 0));
+    pos  = wList(:) > 0;                                  % best rate AMONG positive weights
+    cand = find(pos & (okRate == max(okRate(pos))));      % (max over all picked w = 0 -> empty)
     [~, j] = min(medTilt(cand));
     iBest = cand(j);
 end
