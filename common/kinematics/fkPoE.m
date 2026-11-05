@@ -17,26 +17,36 @@ function T = fkPoE(S, Mhome, theta)
 n   = size(S, 2);
 nFK = size(Mhome, 3);
 T   = cell(1, nFK);
-for k = 1:nFK
-    T{k} = eye(4);      % placeholder so the pipeline still runs
-end
 
-%% TODO[T3-2] (Owner: Jiamo) Running product over joints.
-% E = eye(4);
-% for i = 1:n
-%     E = E * expTwist(S(:, i), theta(i));
-%     T{i} = E * Mhome(:, :, i);
-% end
-% T{nFK} = E * Mhome(:, :, nFK);
-% (Delete the placeholder loop above once this is in.)
-end
-
-function E = expTwist(Si, th) %#ok<DEFNU>
-% EXPTWIST  e^([S] th) for a unit screw axis S = [w; v], closed form.
-%% TODO[T3-2b] (Owner: Jiamo)
-% revolute (||w|| = 1):
-%   W = skew(w);  R = I + sin(th) W + (1 - cos(th)) W^2
-%   p = (I th + (1 - cos(th)) W + (th - sin(th)) W^2) v
-% prismatic (w = 0): R = I, p = v th
 E = eye(4);
+for i = 1:n
+    E = E * expTwist(S(:, i), theta(i));
+    T{i} = E * Mhome(:, :, i);
+end
+for k = n+1:nFK          % end-effector (and any further fixed frames)
+    T{k} = E * Mhome(:, :, k);
+end
+end
+
+function E = expTwist(Si, th)
+% EXPTWIST  e^([S] th) for a unit screw axis S = [w; v], closed form (Lynch & Park 3.51/3.88).
+% revolute (||w|| = 1):
+%   R = I + sin(th) [w] + (1 - cos(th)) [w]^2
+%   p = (I th + (1 - cos(th)) [w] + (th - sin(th)) [w]^2) v
+% prismatic (w = 0): R = I, p = v th
+w = Si(1:3);
+v = Si(4:6);
+if w(1) == 0 && w(2) == 0 && w(3) == 0
+    E = [eye(3), v * th; 0 0 0 1];
+    return
+end
+W  = [    0, -w(3),  w(2);
+       w(3),     0, -w(1);
+      -w(2),  w(1),     0];
+W2 = W * W;
+s  = sin(th);
+c  = 1 - cos(th);
+R  = eye(3) + s * W + c * W2;
+p  = (th * eye(3) + c * W + (th - s) * W2) * v;
+E  = [R, p; 0 0 0 1];
 end

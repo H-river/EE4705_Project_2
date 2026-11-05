@@ -1,21 +1,27 @@
 function scene = scene_t4_2()
-% SCENE_T4_2  Task-4 custom scenario 2 -- e.g. reach over or under a shelf / table (cluttered workspace).
+% SCENE_T4_2  Task-4 custom scenario 2 -- reach under a shelf (box plate + cylinder legs)
 % Owner: Jiamo (T34)
+%
+% Start above a shelf, goal under it with the tool horizontal (like taking a part from
+% a lower shelf). The straight-line interpolation drops the hand through the shelf
+% plate; the planner must pull the arm out in front of the plate edge and come in below.
+% Tuning (PoE, seeds 1-3): 3/3 collision-free with the default 50 iterations.
 
 scene = scene_newrobot_base();       % robot-specific defaults (envSize, view, ...)
 scene.name = 't4_2';
+if isfield(scene, 'q0'), scene = rmfield(scene, 'q0'); end   % use taskInit / taskFinal
+if isfield(scene, 'qT'), scene = rmfield(scene, 'qT'); end
 
-%% TODO[T4-2] (Owner: Jiamo) Design scenario 2.
-% Requirements from the handout / grading:
-%   * multiple obstacles (box / sphere / cylinder), different init & final targets;
-%   * NON-TRIVIAL initialisation: the straight-line joint interpolation must collide
-%     -- main_task4 prints result.initInCollision, it must be true;
-%   * goal pose itself collision-free and reachable (watch the IK warning).
-% Describe in one line why this scenario is hard (goes into the report table):
-scene.description = 'TODO';
-% scene.taskInit  = trvec2tform([...]) * axang2tform([...]);   % or scene.q0 = [...]
-% scene.taskFinal = trvec2tform([...]) * axang2tform([...]);   % or scene.qT = [...]
-% scene.obstacles = struct('type',   {'box', 'sphere'}, ...
-%                          'center', {[x y z], [x y z]}, ...
-%                          'dims',   {[lx ly lz], r});
+down    = axang2tform([0 1 0 pi]);        % tool z pointing down
+forward = axang2tform([0 1 0 pi/2]);      % tool z pointing along +x
+side    = axang2tform([1 0 0 -pi/2]);     %#ok<NASGU> tool z pointing along +y
+
+scene.description = 'Start above a shelf, goal under it (tool horizontal): arm must go round the plate edge.';
+scene.taskInit  = trvec2tform([0.45, -0.10, 0.62]) * down;
+scene.taskFinal = trvec2tform([0.55,  0.10, 0.22]) * forward;
+scene.obstacles = struct('type',   {'box', 'cylinder', 'cylinder'}, ...
+                         'center', {[0.55 0 0.40], [0.67 -0.32 0.20], [0.67 0.32 0.20]}, ...
+                         'dims',   {[0.30 0.70 0.03], [0.02 0.40], [0.02 0.40]}, ...
+                         'rpy',    {[], [], []});
+scene.viewAngle = [20 15];           % side view: shows the detour round the plate edge
 end

@@ -37,17 +37,17 @@ T5-3 画图函数 ──► 所有 Task 的报告图
 ## Task 3+4（Jiamo，约 11 h）
 | 编号 | 文件 | 内容 | 状态 |
 |---|---|---|---|
-| T3-1 | `common/kinematics/computeScrewAxes.m` | 方法 1：在 home 位姿用 getTransform 取 ω、q，v = −ω×q | ⬜ |
-| T3-1b | 同上 | （可选）方法 2：用矩阵对数交叉验证 | ⬜ |
-| T3-1c | 同上 | 报告用的 screw axis 表，对应 URDF 的 origin 和 axis | ⬜ |
-| T3-2 / 2b | `common/kinematics/fkPoE.m` | 累乘一次算出所有关节帧，Rodrigues 闭式解 | ⬜ |
-| T3-3a/b | `Task3_PoE/compareFK.m` | 和 getTransform 比精度、比速度 | ⬜ |
-| T3-4 | `Task3_PoE/main_task3.m` | 同一随机种子下规划结果一致性、每次迭代的耗时 | ⬜ |
-| T4-1a | `common/world/buildVoxelWorld.m` | 越界 clamp | ⬜ |
-| T4-1b/c | 同上 | 球体、圆柱体素化 | ⬜ |
-| T4-1d | 同上 | （可选）旋转的 box | ⬜ |
-| T4-2 | `common/scenes/scene_t4_{1,2,3}.m` | 2–3 个场景，直线初始化必须会碰撞 | ⬜ |
-| T4-3 | `Task4_Scenarios/main_task4.m` | 结果表（可选：多随机种子的成功率）、图、视频 | ⬜ |
+| T3-1 | `common/kinematics/computeScrewAxes.m` | 方法 1：在 home 位姿用 getTransform 取 ω、q，v = −ω×q | ✅ |
+| T3-1b | 同上 | （可选）方法 2：用矩阵对数交叉验证 | ✅ |
+| T3-1c | 同上 | 报告用的 screw axis 表，对应 URDF 的 origin 和 axis | ✅ |
+| T3-2 / 2b | `common/kinematics/fkPoE.m` | 累乘一次算出所有关节帧，Rodrigues 闭式解 | ✅ |
+| T3-3a/b | `Task3_PoE/compareFK.m` | 和 getTransform 比精度、比速度 | ✅ |
+| T3-4 | `Task3_PoE/main_task3.m` | 同一随机种子下规划结果一致性、每次迭代的耗时 | ✅ |
+| T4-1a | `common/world/buildVoxelWorld.m` | 越界 clamp | ✅ |
+| T4-1b/c | 同上 | 球体、圆柱体素化 | ✅ |
+| T4-1d | 同上 | （可选）旋转的 box | ✅ |
+| T4-2 | `common/scenes/scene_t4_{1,2,3}.m` | 2–3 个场景，直线初始化必须会碰撞 | ✅ |
+| T4-3 | `Task4_Scenarios/main_task4.m` | 结果表（可选：多随机种子的成功率）、图、视频 | ✅ |
 
 ## Task 5（T5，末端约束 + 全组画图 + 报告/slides）
 | 编号 | 文件 | 内容 | 状态 |

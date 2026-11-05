@@ -26,7 +26,11 @@ for k = 1:nFrames
     child_joint_position = X(k, 1:3);
 
     % number of spheres to cover the kth segment: one sphere every rad(k) metres
-    nSpheres = ceil(norm(child_joint_position - parent_joint_position) / rad(k)) + 1;
+    % The -1e-9 tolerance keeps the count independent of round-off: coincident frames
+    % (Panda link1/link2, link5/link6) give a length of exactly 0 with getTransform but
+    % ~1e-17 with PoE, which used to flip ceil() from 0 to 1 and change the number of
+    % spheres between waypoints (-> size mismatch in stompTrajCost's velocity term).
+    nSpheres = ceil(norm(child_joint_position - parent_joint_position) / rad(k) - 1e-9) + 1;
 
     % centres linearly spaced along the segment (vectorised version of the original arrayfun)
     s = linspace(0, 1, nSpheres)';
