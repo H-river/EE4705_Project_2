@@ -90,7 +90,7 @@ Additional features:
 |---|---|
 | Joshua Lim | Task 1, Task 2, framework, README, clean-environment reproduction check |
 | Hu Jiamo | Task 3 (PoE), Task 4 (scenarios, multi-obstacle voxelisation) |
-| T5 owner | Task 5, shared plotting functions, report and slides integration |
+| Dexter | Task 5, shared plotting functions, report and slides integration |
 
 ## Reference
 M. Kalakrishnan, S. Chitta, E. Theodorou, P. Pastor and S. Schaal, "STOMP: Stochastic trajectory
