@@ -85,22 +85,8 @@ disp(tbl);
 writetable(tbl, fullfile(outDir, 'bonus_ablation.csv'));
 writetable(raw, fullfile(outDir, 'bonus_ablation_runs.csv'));
 
-%% Figure: success rate, median iterations and worst limit violation per scene / variant
-nS = size(S, 1);  nV = size(V, 1);
-sr = reshape(tbl.successRate, nV, nS)';
-it = reshape(tbl.medianIters, nV, nS)';
-lv = reshape(tbl.maxLimitViolation_rad, nV, nS)';
-fig = figure('Name', 'bonus_ablation', 'Position', [100 100 1500 420]);
-tl = tiledlayout(fig, 1, 3, 'TileSpacing', 'compact', 'Padding', 'compact');
-title(tl, sprintf('STOMP extensions, %d seeds per bar', numel(seeds)));
-ax0 = nexttile(tl);  bar(ax0, 100 * sr);  grid(ax0, 'on');  ylim(ax0, [0 105]);
-set(ax0, 'XTickLabel', S(:, 1));  ylabel(ax0, 'Collision-free runs [%]');
-legend(ax0, V(:, 1), 'Location', 'southwest');
-ax1 = nexttile(tl);  bar(ax1, it);  grid(ax1, 'on');
-set(ax1, 'XTickLabel', S(:, 1));  ylabel(ax1, 'Median iterations');
-ax2 = nexttile(tl);  bar(ax2, rad2deg(lv));  grid(ax2, 'on');
-set(ax2, 'XTickLabel', S(:, 1));  ylabel(ax2, 'Worst joint-limit violation [deg]');
-exportgraphics(fig, fullfile(outDir, 'bonus_ablation.png'), 'Resolution', 200);
+%% Figure (also re-drawable from the CSV: plotAblation(readtable('bonus_ablation.csv'), ...))
+plotAblation(tbl, S(:, 1), V(:, 1), numel(seeds), fullfile(outDir, 'bonus_ablation.png'));
 end
 
 
