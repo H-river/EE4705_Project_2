@@ -51,7 +51,9 @@ resFiles = {};
 if includeResults
     [~, tCommit] = system(sprintf('git -C "%s" log -1 --format=%%ct -- "*.m"', root));
     tCommit = str2double(strtrim(tCommit));                       % newest code commit, unix time
-    folders = [dir(fullfile(root, 'Task*')); dir(fullfile(root, 'Bonus*')); dir(fullfile(root, 'Videos'))];
+    d = [dir(fullfile(root, 'Task*')); dir(fullfile(root, 'Bonus*'))];
+    names = [{d([d.isdir]).name}, {'Videos'}];                    % folders with a results/
+    folders = struct('name', names);
     for i = 1:numel(folders)
         rdir = fullfile(root, folders(i).name, 'results');
         if ~isfolder(rdir)
