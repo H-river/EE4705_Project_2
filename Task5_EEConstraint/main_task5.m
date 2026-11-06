@@ -145,11 +145,18 @@ tags   = {'no_constraint', 'with_constraint'};
 [~, devStats] = plotEEAxisDeviation(runs, model, cfg, labels, ...
     fullfile(cfg.outDir, 'task5_axis_deviation.png'));   % devStats(k).maxDeg / .meanDeg / .angDeg
 
-% (2) Configuration overlays, one figure per run, same view (shared plot)
-plotConfigOverlay(model, resOff.theta, resOff.world, resOff.scene, ...
-    struct('title', 'No constraint', 'saveFile', fullfile(cfg.outDir, 'task5_overlay_noCon.png')));
-plotConfigOverlay(model, resOn.theta, resOn.world, resOn.scene, ...
-    struct('title', 'With constraint', 'saveFile', fullfile(cfg.outDir, 'task5_overlay_withCon.png')));
+% (2) Configuration overlays, one figure per run, same zoomed view, EE y-axis drawn
+sceneZoom = resOff.scene;
+sceneZoom.axisLimits = [-0.2 0.8 -0.6 0.8 -0.1 0.6];   % zoom on the work area, adjust by eye
+opts = struct('stride', 4, 'showEEAxis', true, 'eeAxis', cfg.eeAxis, 'axisLen', 0.10);
+
+opts.title = 'No constraint';   opts.saveFile = fullfile(cfg.outDir, 'task5_overlay_noCon.png');
+fig1 = plotConfigOverlay(model, resOff.theta, resOff.world, sceneZoom, opts);
+opts.title = 'With constraint'; opts.saveFile = fullfile(cfg.outDir, 'task5_overlay_withCon.png');
+fig2 = plotConfigOverlay(model, resOn.theta,  resOn.world,  sceneZoom, opts);
+
+view(fig1.CurrentAxes, 90, 0);  exportgraphics(fig1, fullfile(cfg.outDir, 'task5_side_noCon.png'),  'Resolution', 200);
+view(fig2.CurrentAxes, 90, 0);  exportgraphics(fig2, fullfile(cfg.outDir, 'task5_side_withCon.png'), 'Resolution', 200);
 
 % (3) What the constraint costs: iterations, time, EE path length, obstacle cost, collisions.
 %     Obstacle cost is re-evaluated for BOTH runs with the same obstacle-only settings
