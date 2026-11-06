@@ -1,9 +1,9 @@
 %% Task 5 -- End-effector orientation constraint ("carry a cup of coffee")
 % Owner: T5
 %
-% Cost:  common/stomp/stompConstraintCost.m      (TODO[T5-1])
-% Scene: common/scenes/scene_t5.m                (TODO[T5-2a], upright start/goal)
-% Shared plots: common/viz/plotConfigOverlay.m, plotCostHistory.m (TODO[T5-3a/b])
+% Cost:  common/stomp/stompConstraintCost.m
+% Scene: common/scenes/scene_t5.m                (upright start/goal)
+% Shared plots: common/viz/plotConfigOverlay.m, plotCostHistory.m
 % Same scene, same seed, run twice: without and with the constraint.
 
 clear; clc; close all;
@@ -13,8 +13,10 @@ addpath(thisDir);
 
 rc = robotConfig();
 cfg = defaultConfig();
-cfg.fkMode       = 'getTransform';            % switch to 'getTransform' until T3 is done
+cfg.fkMode       = 'PoE';                     % Task-3 FK, ~13x faster sweep than getTransform
 cfg.sphereRadius = rc.sphereRadius;
+cfg.maxIter      = 200;                       % 50 stopped every constrained run early
+                                              % (some still colliding); 200 as in Task 4
 cfg.outDir       = fullfile(thisDir, 'results');
 cfg.displayAnimation = false;
 cfg.eeAxis    = 2;                   % EE y-axis
@@ -30,7 +32,7 @@ cfgOff = cfg;  cfgOff.useEEConstraint = false;
 scene.name = 't5_noCon';
 rng(0); resOff = runPipeline(model, scene, cfgOff);
 
-%% With constraint -- weight sweep (TODO[T5-2b])
+%% With constraint -- weight sweep
 % STOMP is stochastic (mvnrnd noise), so ONE run per weight can mislead: a lucky seed can
 % make a weak weight look good. Every weight is therefore run with several seeds and
 % judged on the median / worst case. The sweep calls runSTOMP directly (not runPipeline)
@@ -57,7 +59,7 @@ maxTilt  = nan(nW, nS);   meanTilt = nan(nW, nS);
 pathLenS = nan(nW, nS);   nIterS   = nan(nW, nS);
 collideS = false(nW, nS);
 
-fprintf('\n--- T5-2b weight sweep: %d weights x %d seeds = %d STOMP runs ---\n', nW, nS, nW * nS);
+fprintf('\n--- Weight sweep: %d weights x %d seeds = %d STOMP runs ---\n', nW, nS, nW * nS);
 for i = 1:nW
     c = cfgOn;  c.w_con = wList(i);
     for s = 1:nS
@@ -132,16 +134,16 @@ cfgOn.w_con = wBest;  cfgOn.verbose = true;
 scene.name = 't5_withCon';
 rng(0); resOn = runPipeline(model, scene, cfgOn);
 
-%% T5-2c Before/after comparison (the key Task-5 result)
+%% Before/after comparison (the key Task-5 result)
 runs   = {resOff, resOn};
 labels = {'no constraint', sprintf('with constraint (w_con = %g)', cfgOn.w_con)};
 tags   = {'no_constraint', 'with_constraint'};
 
-% (1) Tilt of the constrained EE axis at every waypoint  (plotEEAxisDeviation.m, T5-2d)
+% (1) Tilt of the constrained EE axis at every waypoint  (plotEEAxisDeviation.m)
 [~, devStats] = plotEEAxisDeviation(runs, model, cfg, labels, ...
     fullfile(cfg.outDir, 'task5_axis_deviation.png'));   % devStats(k).maxDeg / .meanDeg / .angDeg
 
-% (2) Configuration overlays, one figure per run, same view (shared plot, T5-3a)
+% (2) Configuration overlays, one figure per run, same view (shared plot)
 plotConfigOverlay(model, resOff.theta, resOff.world, resOff.scene, ...
     struct('title', 'No constraint', 'saveFile', fullfile(cfg.outDir, 'task5_overlay_noCon.png')));
 plotConfigOverlay(model, resOn.theta, resOn.world, resOn.scene, ...
@@ -176,7 +178,7 @@ cmp = table(maxTilt2, meanTilt2, pathLen, obsCost, nIter, totTime, collides, ...
 disp(cmp);
 writetable(cmp, fullfile(cfg.outDir, 'task5_comparison.csv'), 'WriteRowNames', true);
 
-% (4) Optional: cost curves of both runs (shared plot, T5-3b)
+% (4) Optional: cost curves of both runs (shared plot)
 % plotCostHistory(runs, labels, fullfile(cfg.outDir, 'task5_cost.png'));
 
 

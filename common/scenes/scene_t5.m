@@ -25,17 +25,20 @@ scene.name = 't5_upright';           % main_task5 overrides with t5_noCon / t5_w
 if isfield(scene, 'q0'), scene = rmfield(scene, 'q0'); end
 if isfield(scene, 'qT'), scene = rmfield(scene, 'qT'); end
 
-%% Design parameters (tuned for the Kinova placeholder; re-tune if the Task-2 robot differs)
+%% Design parameters (tuned for the Panda)
 eeAxis  = 2;                 % MUST equal cfg.eeAxis in main_task5.m  (1 = x, 2 = y, 3 = z)
 r       = 0.50;              % horizontal distance of start / goal from the base axis [m]
-hEE     = 0.30;              % EE height of start / goal [m]
+hEE     = 0.20;              % EE height of start / goal [m]. Not 0.30: with the tool
+                             % horizontal and EE-y vertical the Panda cannot reach r = 0.5 m
+                             % at 0.30 m (IK best ~3 cm off, joint 5 at its limit), but it
+                             % reaches it exactly at 0.20 m and at 0.50 m.
 azStart = deg2rad(-35);      % azimuth of the start about the base z axis
 azGoal  = deg2rad(60);       % azimuth of the goal
 
-% Box on the arc between start and goal (azimuth ~11 deg, same radius), same size as the
-% Task-1 cube. The straight-line joint interpolation sweeps through it, so the planner
+% Box on the arc between start and goal (azimuth ~11 deg, same radius and height), same
+% size as the Task-1 cube. The straight-line joint interpolation sweeps through it, so the planner
 % must lift the EE over it (or go around) while keeping the axis upright.
-boxCenter = [0.49 0.10 0.30];
+boxCenter = [0.49 0.10 hEE];
 boxDims   = [0.16 0.16 0.16];
 
 %% Start / goal poses: EE axis eeAxis = world z, forward column radially outward
@@ -49,6 +52,9 @@ scene.taskFinal = uprightTform(pGoal,  azGoal,  eeAxis);
 scene.obstacles = struct('type',   {'box'}, ...
                          'center', {boxCenter}, ...
                          'dims',   {boxDims});
+
+scene.viewAngle = [60 30];   % start (y < 0) -> around the box -> goal (y > 0) all visible;
+                             % the inherited Task-1 view looks at the arm from behind
 
 scene.description = ['Upright EE axis at start and goal; box on the sweep path forces ' ...
                      'a detour that tilts the EE unless the constraint is active.'];
