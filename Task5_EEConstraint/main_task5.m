@@ -155,8 +155,11 @@ fig1 = plotConfigOverlay(model, resOff.theta, resOff.world, sceneZoom, opts);
 opts.title = 'With constraint'; opts.saveFile = fullfile(cfg.outDir, 'task5_overlay_withCon.png');
 fig2 = plotConfigOverlay(model, resOn.theta,  resOn.world,  sceneZoom, opts);
 
-view(fig1.CurrentAxes, 90, 0);  exportgraphics(fig1, fullfile(cfg.outDir, 'task5_side_noCon.png'),  'Resolution', 200);
-view(fig2.CurrentAxes, 90, 0);  exportgraphics(fig2, fullfile(cfg.outDir, 'task5_side_withCon.png'), 'Resolution', 200);
+view(fig1.CurrentAxes, 90, 0);  exportgraphics(fig1, fullfile(cfg.outDir, 'task5_y_z_noCon.png'),  'Resolution', 200);
+view(fig2.CurrentAxes, 90, 0);  exportgraphics(fig2, fullfile(cfg.outDir, 'task5_y_z_withCon.png'), 'Resolution', 200);
+
+view(fig1.CurrentAxes, 0, 90);  exportgraphics(fig1, fullfile(cfg.outDir, 'task5_x_y_noCon.png'),  'Resolution', 200);
+view(fig2.CurrentAxes, 0, 90);  exportgraphics(fig2, fullfile(cfg.outDir, 'task5_x_y_withCon.png'), 'Resolution', 200);
 
 % (3) What the constraint costs: iterations, time, EE path length, obstacle cost, collisions.
 %     Obstacle cost is re-evaluated for BOTH runs with the same obstacle-only settings
