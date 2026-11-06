@@ -1,11 +1,11 @@
 %% Task 3 -- Replace getTransform with Product-of-Exponentials FK
 % Owner: Jiamo (T34)
 %
-%   1. common/kinematics/computeScrewAxes.m + fkPoE.m   (TODO[T3-1], TODO[T3-2])
-%   2. screwAxisTable.m : S_i table + matrix-log cross-check     (TODO[T3-1b/c])
-%   3. compareFK.m      : accuracy + speed vs getTransform       (TODO[T3-3])
+%   1. common/kinematics/computeScrewAxes.m + fkPoE.m
+%   2. screwAxisTable.m : S_i table + matrix-log cross-check
+%   3. compareFK.m      : accuracy + speed vs getTransform
 %   4. this script      : full STOMP run with PoE vs getTransform on the Task-2 robot,
-%                         same seed -> same trajectory, per-iteration timing (TODO[T3-4])
+%                         same seed -> same trajectory, per-iteration timing
 %
 % Outputs (Task3_PoE/results/): screw-axis CSVs, fk_compare.csv, plan_compare.csv,
 % task3_cost.png, task3_overlay.png, and the usual runPipeline .mat files.
@@ -59,7 +59,7 @@ cfg.fkMode = 'getTransform';
 modelGT = buildRobotModel(robotName, eeName, 'getTransform');
 rng(0); resGT = runPipeline(modelGT, scene, cfg);
 
-%% TODO[T3-4] Planning-level comparison for the report
+%% Planning-level comparison for the report
 % Same seed -> same noise samples; PoE is exact to ~1e-15, so the trajectories must
 % agree to round-off unless the tiny FK difference flips a voxel index (then they can
 % drift apart a little -- report the number either way).

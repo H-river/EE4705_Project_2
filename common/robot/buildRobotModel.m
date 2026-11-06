@@ -28,8 +28,8 @@ model.name = robotName;
 
 %% Load
 if endsWith(robotName, '.urdf', 'IgnoreCase', true)
-    %% TODO[T2-1b] (Owner: Joshua Lim) External URDF: add the mesh path argument
-    % (importrobot(..., 'MeshPath', ...)) so show() renders the meshes.
+    % External URDF (not used by the submitted tasks, which use the built-in Panda):
+    % show() only renders meshes if importrobot is also given 'MeshPath'.
     model.robot = importrobot(robotName, 'DataFormat', 'column');
 else
     model.robot = loadrobot(robotName, 'DataFormat', 'column');

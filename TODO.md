@@ -19,20 +19,20 @@ T5-3 画图函数 ──► 所有 Task 的报告图
 ## Task 1+2（Joshua Lim，约 11 h）
 | 编号 | 文件 | 内容 | 状态 |
 |---|---|---|---|
-| T1-1a–e | `common/stomp/runSTOMP.m` | 主循环：采样 → 局部代价 → 概率 → dθ 并更新 → 新代价 | ⬜ |
-| T1-2 | `common/kinematics/updateJointsWorldPosition.m` | getTransform 分支（直接用 column 格式，比原版的 struct 快） | ⬜ |
-| T1-3 | `common/stomp/stompDTheta.m` | 按概率加权求 δθ | ⬜ |
-| T1-4 | `common/stomp/stompSamples.m` | 每个关节用 mvnrnd 采样，首尾补 0 | ⬜ |
-| T1-5 | `common/stomp/stompObstacleCost.m` | Eq.(13) | ⬜ |
-| T1-6a | `common/stomp/stompObstacleCost.m` | **Bug**：越界采样的代价被算成 0 | ⬜ |
-| T1-6b | `runSTOMP.m` 和 `stompTrajCost.m` | **Bug**：控制代价多加了跨关节项，应改成 trace | ⬜ |
-| T1-7 | `Task1_Kinova/main_task1.m` | Task 1 的报告图 | ⬜ |
-| T2-1 | `common/config/robotConfig.m` | **选机器人**（外部 URDF 要处理 mesh 路径，见 T2-1b） | ⬜ |
-| T2-2 | `robotConfig.m`、`stompRobotSphere.m` | 碰撞球半径（可以每段 link 单独设）、检查覆盖 | ⬜ |
-| T2-3 | `common/robot/solveInitFinal.m` | 有移动关节时别做 wrapToPi（已按关节类型处理，需要验证） | ⬜ |
-| T2-4 | `common/scenes/scene_newrobot_base.m` | 新机器人的起止位姿、障碍物、envSize | ⬜ |
-| T2-5/6 | `Task2_NewRobot/main_task2.m` | 关节和碰撞球的检查图、报告图 | ⬜ |
-| FW | 根目录 | README 定稿；用全新 MATLAB 环境跑一遍复现检查；打包 zip | ⬜ |
+| T1-1a–e | `common/stomp/runSTOMP.m` | 主循环：采样 → 局部代价 → 概率 → dθ 并更新 → 新代价 | ✅ |
+| T1-2 | `common/kinematics/updateJointsWorldPosition.m` | getTransform 分支（直接用 column 格式，比原版的 struct 快） | ✅ |
+| T1-3 | `common/stomp/stompDTheta.m` | 按概率加权求 δθ | ✅ |
+| T1-4 | `common/stomp/stompSamples.m` | 每个关节用 mvnrnd 采样，首尾补 0 | ✅ |
+| T1-5 | `common/stomp/stompObstacleCost.m` | Eq.(13) | ✅ |
+| T1-6a | `common/stomp/stompObstacleCost.m` | **Bug**：越界采样的代价被算成 0 | ✅ |
+| T1-6b | `runSTOMP.m` 和 `stompTrajCost.m` | **Bug**：控制代价多加了跨关节项，应改成 trace | ✅ |
+| T1-7 | `Task1_Kinova/main_task1.m` | Task 1 的报告图 | ✅ |
+| T2-1 | `common/config/robotConfig.m` | **选机器人**（外部 URDF 要处理 mesh 路径，见 T2-1b） | ✅ |
+| T2-2 | `robotConfig.m`、`stompRobotSphere.m` | 碰撞球半径（可以每段 link 单独设）、检查覆盖 | 🟡 覆盖图已出（`task2_spheres.png`）：5 cm 球大多在连杆网格内侧，靠 5 cm safetyMargin 补偿，网格碰撞检测全部通过；半径没按连杆调 |
+| T2-3 | `common/robot/solveInitFinal.m` | 有移动关节时别做 wrapToPi（已按关节类型处理，需要验证） | ✅ |
+| T2-4 | `common/scenes/scene_newrobot_base.m` | 新机器人的起止位姿、障碍物、envSize | ✅ |
+| T2-5/6 | `Task2_NewRobot/main_task2.m` | 关节和碰撞球的检查图、报告图 | ✅ |
+| FW | 根目录 | README 定稿；用全新 MATLAB 环境跑一遍复现检查；打包 zip | 🟡 README 已定稿；打包用 `tools/make_submission.m`（排除 TODO.md 和 tools/，自动加报告 PDF）；还差报告 PDF |
 
 ## Task 3+4（Jiamo，约 11 h）
 | 编号 | 文件 | 内容 | 状态 |
@@ -52,12 +52,12 @@ T5-3 画图函数 ──► 所有 Task 的报告图
 ## Task 5（T5，末端约束 + 全组画图 + 报告/slides）
 | 编号 | 文件 | 内容 | 状态 |
 |---|---|---|---|
-| T5-1 | `common/stomp/stompConstraintCost.m` | 末端 y 轴竖直，用 ℓ1 范数 | ⬜ |
-| T5-2a | `common/scenes/scene_t5.m` | 起止位姿本身就是竖直的 | ⬜ |
-| T5-2b | `Task5_EEConstraint/main_task5.m` | 调 w_con，做权重扫描 | ⬜ |
-| T5-2c/d | `main_task5.m`、`plotEEAxisDeviation.m` | 加约束前后对比（每个 waypoint 的偏差角） | ⬜ |
-| T5-3a | `common/viz/plotConfigOverlay.m` | 构型叠加图（全组共用） | ⬜ |
-| T5-3b | `common/viz/plotCostHistory.m` | 代价曲线（全组共用） | ⬜ |
+| T5-1 | `common/stomp/stompConstraintCost.m` | 末端 y 轴竖直，用 ℓ1 范数 | ✅ |
+| T5-2a | `common/scenes/scene_t5.m` | 起止位姿本身就是竖直的 | ✅ |
+| T5-2b | `Task5_EEConstraint/main_task5.m` | 调 w_con，做权重扫描 | ✅ |
+| T5-2c/d | `main_task5.m`、`plotEEAxisDeviation.m` | 加约束前后对比（每个 waypoint 的偏差角） | ✅ |
+| T5-3a | `common/viz/plotConfigOverlay.m` | 构型叠加图（全组共用） | ✅ |
+| T5-3b | `common/viz/plotCostHistory.m` | 代价曲线（全组共用） | ✅ |
 | T5-4 | — | 整合报告（每人写自己的部分 + 贡献说明）、整合 slides | ⬜ |
 
 ## 加分项（谁有空谁做，报告里明确写出来）

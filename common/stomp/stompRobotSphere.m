@@ -38,7 +38,7 @@ for k = 1:nFrames
     radi_cell{k}   = rad(k) * ones(nSpheres, 1);
 end
 
-%% TODO[T2-2b] (Owner: Joshua Lim) For robots with large link offsets (UR elbow offsets,
+% Note: for robots with large link offsets (UR elbow offsets,
 % KR210 shoulder), a straight segment between joint ORIGINS may cut through air and
 % miss part of the real link. Check with a plot of the spheres over show(robot) and,
 % if needed, add intermediate frames (e.g. fixed bodies) to fkBodyNames.

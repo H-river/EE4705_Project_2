@@ -1,13 +1,13 @@
 %% Task 4 -- Custom collision-avoidance scenarios
 % Owner: Jiamo (T34)
 %
-% Scenarios: common/scenes/scene_t4_1.m .. scene_t4_3.m  (TODO[T4-2])
-% Multi-obstacle voxelisation: common/world/buildVoxelWorld.m (TODO[T4-1a..d])
+% Scenarios: common/scenes/scene_t4_1.m .. scene_t4_3.m
+% Multi-obstacle voxelisation: common/world/buildVoxelWorld.m
 % Uses the Task-2 robot + PoE FK (Tasks 3/4 build on each other).
 %
 % For every scenario:
 %   1. one "showcase" run through runPipeline (rng 0): figures, .mat, optional video;
-%   2. a robustness study (TODO[T4-3]): STOMP from the same start/goal with nSeeds
+%   2. a robustness study: STOMP from the same start/goal with nSeeds
 %      different seeds, success = mesh-based collision check finds no collision.
 % Outputs (Task4_Scenarios/results/): task4_summary.csv, task4_seeds.csv,
 % task4_<scene>_overlay.png, task4_cost.png, runPipeline .mat (+ .avi if makeVideos).
@@ -86,7 +86,7 @@ for s = 1:nS
         'minSphereClearance_m', 'successRate', 'medianIters', 'medianTime_s'})]; %#ok<AGROW>
 end
 
-%% TODO[T4-3] Results table + figures for report / slides
+%% Results table + figures for report / slides
 disp(summary(:, setdiff(summary.Properties.VariableNames, {'description'}, 'stable')));
 writetable(summary,  fullfile(cfg.outDir, 'task4_summary.csv'));
 writetable(seedRows, fullfile(cfg.outDir, 'task4_seeds.csv'));

@@ -1,5 +1,5 @@
 function tbl = screwAxisTable(model, csvFile)
-% SCREWAXISTABLE  Report material for Task 3 (TODO[T3-1b], TODO[T3-1c]).
+% SCREWAXISTABLE  Report material for Task 3.
 %   * Table of omega_i, q_i, v_i of every joint (method 1, computeScrewAxes), next to the
 %     URDF joint <origin>/<axis> data (Joint.JointToParentTransform / JointAxis), so the
 %     report can relate S_i to the robot description.

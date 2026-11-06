@@ -9,7 +9,7 @@ nDiscretize = size(trajProb, 2);
 % variable declaration
 dtheta = zeros(nJoints, nDiscretize);
 
-%% TODO[T1-3] (Owner: Joshua Lim) Iterate over all joints to compute dtheta (STOMP Table 1, step 3):
+%% Probability-weighted update for every joint (STOMP Table 1, step 3):
 % delta_theta_i = sum_k P(theta_k, i) * eps_k,i     (element-wise over time step i)
 for m = 1:nJoints
     dtheta(m, :) = sum( trajProb .* em{m}, 1);

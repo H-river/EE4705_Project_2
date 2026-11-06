@@ -43,14 +43,14 @@ for i = 1:numel(obstacles)
             dims = ob.dims(:)';
             R = eye(3);
             if isfield(ob, 'rpy') && ~isempty(ob.rpy)
-                %% TODO[T4-1d] rotated box
+                %% rotated box
                 R = eul2rotm(fliplr(ob.rpy(:)'), 'ZYX');
             end
             obj = collisionBox(dims(1), dims(2), dims(3));
             obj.Pose = [R, c'; 0 0 0 1];
 
             if isequal(R, eye(3))
-                % ---- original cube rule, generalised; TODO[T4-1a] clamp ----
+                % ---- original cube rule, generalised, clamped to the grid ----
                 [ix, iy, iz, ok] = idxRange(c - dims / 2, c + dims / 2, corner, voxelSize, gridSize);
                 if ok, binary_world(ix, iy, iz) = 1; end
             else
@@ -68,7 +68,7 @@ for i = 1:numel(obstacles)
             r = ob.dims(1);
             obj = collisionSphere(r);
             obj.Pose = trvec2tform(c);
-            %% TODO[T4-1b] sphere: voxel centre within r (+pad) of the centre (ndgrid, not meshgrid)
+            %% sphere: voxel centre within r (+pad) of the centre (ndgrid, not meshgrid)
             rp = r + pad;
             [ix, iy, iz, ok] = idxRange(c - rp, c + rp, corner, voxelSize, gridSize);
             if ok
@@ -81,7 +81,7 @@ for i = 1:numel(obstacles)
             r = ob.dims(1);  h = ob.dims(2);
             obj = collisionCylinder(r, h);
             obj.Pose = trvec2tform(c);
-            %% TODO[T4-1c] upright cylinder: radial distance in xy <= r and |z - zc| <= h/2 (+pad)
+            %% upright cylinder: radial distance in xy <= r and |z - zc| <= h/2 (+pad)
             rp = r + pad;  hp = h / 2 + pad;
             [ix, iy, iz, ok] = idxRange(c - [rp rp hp], c + [rp rp hp], corner, voxelSize, gridSize);
             if ok
@@ -107,7 +107,7 @@ end
 
 function [ix, iy, iz, ok] = idxRange(lo, hi, corner, voxelSize, gridSize)
 % Voxel index ranges covering the metric interval [lo, hi], clamped to the grid
-% (TODO[T4-1a]: an obstacle partly outside the world used to make sub2ind error).
+% (Before: an obstacle partly outside the world used to make sub2ind error).
 % ok = false if the interval lies completely outside the world.
 vLo = max(ceil((lo - corner) ./ voxelSize), 1);
 vHi = min(ceil((hi - corner) ./ voxelSize), gridSize);

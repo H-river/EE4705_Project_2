@@ -4,10 +4,8 @@ MATLAB implementation of STOMP (Kalakrishnan et al., ICRA 2011) for collision-fr
 planning, extended with a second manipulator, Product-of-Exponentials forward kinematics,
 custom multi-obstacle scenarios and an end-effector orientation constraint.
 
-> Work in progress — open items are tracked in [`TODO.md`](TODO.md).
-
 ## Requirements
-- MATLAB R2021a or newer (uses `vecnorm`, `'all'`, implicit expansion, `exportgraphics`)
+- MATLAB R2021a or newer (uses `vecnorm`, `'all'`, implicit expansion, `exportgraphics`) — tested with R2023b
 - Robotics System Toolbox (`loadrobot`, `getTransform`, `inverseKinematics`, `checkCollision`)
 - Statistics and Machine Learning Toolbox (`mvnrnd`)
 - Image Processing Toolbox (`bwdist`, used for the signed distance transform)
@@ -15,15 +13,17 @@ custom multi-obstacle scenarios and an end-effector orientation constraint.
 ## How to run
 Each task has one entry script. Open it and press **Run** — it adds `common/` to the path itself.
 
-| Task | Entry script | What it shows |
-|---|---|---|
-| 1 | `Task1_Kinova/main_task1.m` | Kinova Gen3, original scenario, `getTransform` FK |
-| 2 | `Task2_NewRobot/main_task2.m` | Second manipulator (set in `common/config/robotConfig.m`) |
-| 3 | `Task3_PoE/main_task3.m` | PoE FK: accuracy/speed vs `getTransform` (`compareFK.m`), then planning with PoE |
-| 4 | `Task4_Scenarios/main_task4.m` | Three custom multi-obstacle scenarios |
-| 5 | `Task5_EEConstraint/main_task5.m` | EE y-axis kept upright: with vs. without constraint |
+| Task | Entry script | What it shows | FK |
+|---|---|---|---|
+| 1 | `Task1_Kinova/main_task1.m` | Kinova Gen3, original scenario, animation | `getTransform` |
+| 2 | `Task2_NewRobot/main_task2.m` | Franka Emika Panda (`common/config/robotConfig.m`) in a Task-1-like scene; collision-sphere coverage plot | `getTransform` |
+| 3 | `Task3_PoE/main_task3.m` | Screw-axis table, PoE accuracy/speed vs `getTransform` (`compareFK.m`), same-seed planning with both | PoE vs `getTransform` |
+| 4 | `Task4_Scenarios/main_task4.m` | Three custom multi-obstacle scenarios + 10-seed robustness study | PoE |
+| 5 | `Task5_EEConstraint/main_task5.m` | EE y-axis kept upright: weight sweep, then with vs. without constraint | PoE |
 
-Outputs (`.mat`, videos, figures) go to each task's `results/` folder.
+Outputs (`.mat`, figures, `.csv` tables, optional videos) go to each task's `results/` folder,
+which is created on the first run. All runs are seeded (`rng`), so they are reproducible.
+Videos: set `cfg.recordResultVideo = true` (Task 4: `makeVideos = true`).
 
 ## Repository layout
 ```
@@ -57,7 +57,7 @@ Interface changes (so one code base serves all five tasks):
 - Scripts `helperSTOMP`, `helperCreateObstaclesKINOVA`, `helperInitialVisualizerKINOVA` became the
   functions `runSTOMP`, `buildVoxelWorld`, `initVisualizer`.
 
-Bug fixes (to be completed / confirmed — see `TODO.md`, section "Bug fixes"):
+Bug fixes:
 - Obstacle cost returned 0 for samples outside the voxel world (`try/catch` swallowed the index error).
 - Control cost summed cross-joint terms (`sum(theta*R*theta','all')` instead of the trace).
 - `qc_cost = 0` inside the loop overwrote the constraint-cost vector with a scalar.
@@ -66,6 +66,24 @@ Bug fixes (to be completed / confirmed — see `TODO.md`, section "Bug fixes"):
   `theta_animation` when the iteration count was a multiple of 5.
 - The zero-gradient stop test used `sum(...) == 0` (positive and negative entries can cancel).
 - Kinova: `EndEffector_Link` was not among the frames, so the last link had no collision spheres.
+- Prismatic joints were wrapped to [-pi, pi] (`solveInitFinal` now checks the joint type).
+- An obstacle partly outside the voxel world made `sub2ind` error (`buildVoxelWorld` clamps).
+- Coincident frames (Panda link1/link2, link5/link6) have length 0 with `getTransform` but
+  ~1e-17 with PoE; `ceil` then changed the number of collision spheres between waypoints and
+  `stompTrajCost` crashed (`stompRobotSphere` now uses a small tolerance).
+
+Additional features:
+- **PoE forward kinematics** (`computeScrewAxes`, `fkPoE`): screw axes computed once at the
+  zero configuration; one running product with closed-form Rodrigues exponentials gives all
+  frames. Same result as `getTransform` to ~1e-15, FK ~35x faster, STOMP iteration ~13x faster;
+  screw axes cross-checked with the matrix logarithm.
+- **Multi-obstacle voxelisation**: boxes (optionally rotated), spheres and upright cylinders.
+- **Ground-truth collision check** with the robot meshes (`checkTrajCollision`), independent of
+  the sphere model STOMP optimises.
+- **Robustness studies**: Task 4 runs each scenario with 10 seeds; Task 5 sweeps the
+  constraint weight over 5 seeds per weight and picks it automatically.
+- **Convergence patience** (`cfg.convergencePatience`): stop only after several consecutive
+  small cost changes instead of the first one.
 
 ## Team
 | Member | Tasks |

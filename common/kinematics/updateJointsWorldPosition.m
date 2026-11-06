@@ -19,19 +19,16 @@ T = cell(1, nFK);
 switch model.fkMode
     case 'getTransform'
         for k = 1:nFK
-            %% TODO[T1-2] (Owner: Joshua Lim) Built-in FK with getTransform.
-            % - Pose of body model.fkBodyNames{k} w.r.t. the base frame.
-            % - model.robot is DataFormat 'column', so getTransform can take `theta`
-            %   directly -- no need to build a struct configuration like the original
-            %   sample code did (that struct copy was a large part of the run time;
-            %   worth one line in the report as an efficiency fix).
-            % - Fill T{k} (4x4) and X(k,:) (1x4, the translation column of T{k}).
+            % Pose of body model.fkBodyNames{k} w.r.t. the base frame. model.robot is
+            % DataFormat 'column', so getTransform takes `theta` directly -- the original
+            % sample code built a struct configuration on every call, which was a large
+            % part of its run time (efficiency fix).
             T{k} = getTransform(model.robot ,theta, model.fkBodyNames{k});          
             X(k, :) = T{k}(:, 4)'; 
         end
 
     case 'PoE'
-        % Owner: T34 -- implemented inside fkPoE (TODO[T3-2]).
+        % One running product of exponentials gives every frame (see fkPoE).
         T = fkPoE(model.S, model.Mhome, theta);
         for k = 1:nFK
             X(k, :) = T{k}(:, 4)';

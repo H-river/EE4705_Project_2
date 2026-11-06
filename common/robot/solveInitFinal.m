@@ -32,9 +32,8 @@ else
 end
 
 rng(rngState);
-%% Wrap continuous / revolute joints into [-pi, pi]
-%% TODO[T2-3] (Owner: Joshua Lim) If the chosen robot has a PRISMATIC joint, do not wrap it.
-% Original code called wrapToPi on the whole vector, which is wrong for prismatic joints.
+%% Wrap continuous / revolute joints into [-pi, pi]; prismatic joints are NOT wrapped
+% (bug fix: the original code called wrapToPi on the whole vector).
 isAngular = ~strcmp(model.jointTypes, 'prismatic')';
 q0(isAngular) = wrapToPi(q0(isAngular));
 qT(isAngular) = wrapToPi(qT(isAngular));

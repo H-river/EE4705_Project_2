@@ -24,7 +24,7 @@ end
 lim(isinf(lim)) = sign(lim(isinf(lim))) * pi;    % continuous joints -> [-pi, pi]
 Q = lim(:, 1) + rand(mGT.nJoints, nTest) .* (lim(:, 2) - lim(:, 1));
 
-%% TODO[T3-3a] Accuracy -- every frame k = 1..nFK (the planner uses all of them)
+%% Accuracy -- every frame k = 1..nFK (the planner uses all of them)
 maxPos = 0;  maxRot = 0;
 for t = 1:nTest
     [~, Tg] = updateJointsWorldPosition(mGT,  Q(:, t));
@@ -37,7 +37,7 @@ end
 stats.maxPosErr = maxPos;
 stats.maxRotErr = maxRot;
 
-%% TODO[T3-3b] Speed (median of a few configs, each timed with timeit)
+%% Speed (median of a few configs, each timed with timeit)
 nTime = 5;
 tg = zeros(1, nTime);  tp = tg;  tn = tg;
 for t = 1:nTime

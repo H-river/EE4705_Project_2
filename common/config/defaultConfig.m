@@ -17,12 +17,12 @@ cfg.convergencePatience  = 3;     % stop after this many CONSECUTIVE |dQ| < thre
 
 %% Obstacle cost (Eq. 13)
 cfg.safetyMargin = 0.05;          % epsilon in Eq. (13) [m] (was hard-coded in stompObstacleCost)
-cfg.sphereRadius = 0.05;          % scalar, or 1 x nFK vector (one radius per link) -- see TODO[T2-2]
+cfg.sphereRadius = 0.05;          % scalar, or 1 x nFK vector (one radius per link)
 cfg.w_obs        = 1000;          % weight of obstacle cost in S(theta)
 
 %% End-effector orientation constraint (Task 5)
 cfg.useEEConstraint = false;      % turn on in Task 5
-cfg.w_con           = 0;          % weight of constraint cost in S(theta)  -- TODO[T5-2] tune
+cfg.w_con           = 0;          % weight of constraint cost in S(theta)  (Task 5 picks it by a weight sweep)
 cfg.eeAxis          = 2;          % which EE body axis to constrain: 1=x, 2=y, 3=z
 cfg.worldAxis       = [0; 0; 1];  % target direction in world frame (upright)
 
