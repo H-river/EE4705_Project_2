@@ -21,10 +21,14 @@ Each task has one entry script. Open it and press **Run** — it adds `common/` 
 | 4 | `Task4_Scenarios/main_task4.m` | Three custom multi-obstacle scenarios + 10-seed robustness study | PoE |
 | 5 | `Task5_EEConstraint/main_task5.m` | EE y-axis kept upright: weight sweep, then with vs. without constraint | PoE |
 | Bonus | `Bonus_STOMPExtensions/main_bonus.m` | Joint-angle wrap demo (Kinova) + ablation of the STOMP extensions on all scenes (~15 min) | PoE |
+| Videos | `Videos/make_videos.m` | MP4 videos for the presentation from the saved results (run the tasks first) | PoE |
 
 Outputs (`.mat`, figures, `.csv` tables, optional videos) go to each task's `results/` folder,
 which is created on the first run. All runs are seeded (`rng`), so they are reproducible.
-Videos: set `cfg.recordResultVideo = true` (Task 4: `makeVideos = true`).
+The submitted zip already contains the figures, tables and videos of our final run in these
+`results/` folders (the `.mat` files are left out for size; the scripts regenerate them).
+Videos: `Videos/make_videos.m` (smooth MP4, side-by-side comparisons); the original
+per-waypoint AVI is still available with `cfg.recordResultVideo = true`.
 
 ## Repository layout
 ```
