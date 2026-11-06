@@ -5,9 +5,9 @@
 % Done when: the planned path is collision-free (isTrajectoryInCollision = 0) and the
 % animation plays, with getTransform FK.
 %
-% TODO tags for this task live in common/:
-%   T1-1a..e runSTOMP.m | T1-2 updateJointsWorldPosition.m | T1-3 stompDTheta.m
-%   T1-4 stompSamples.m | T1-5 stompObstacleCost.m | T1-6a/b bug fixes
+% Completed sample-code functions (in common/): runSTOMP.m (was helperSTOMP.m),
+%   updateJointsWorldPosition.m, stompDTheta.m, stompSamples.m, stompObstacleCost.m.
+% Outputs (Task1_Kinova/results/): task1_overlay.png, task1_cost.png, runPipeline .mat.
 
 clear; clc; close all;
 thisDir = fileparts(mfilename('fullpath'));
@@ -23,6 +23,8 @@ scene = scene_kinova_default();
 rng(0);
 result = runPipeline(model, scene, cfg);
 
-%% TODO[T1-7] (Owner: Joshua Lim) Report figures for Task 1 (once T5-3 plotting is ready):
-% plotConfigOverlay(model, result.theta, result.world, scene, struct('saveFile', fullfile(cfg.outDir,'task1_overlay.png')));
-% plotCostHistory({result}, {'Kinova, getTransform'}, fullfile(cfg.outDir,'task1_cost.png'));
+%% Report figures
+plotConfigOverlay(model, result.theta, result.world, scene, struct( ...
+    'title', 'Task 1: Kinova Gen3, getTransform', ...
+    'saveFile', fullfile(cfg.outDir, 'task1_overlay.png')));
+plotCostHistory({result}, {'Kinova, getTransform'}, fullfile(cfg.outDir, 'task1_cost.png'));
