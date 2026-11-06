@@ -35,9 +35,7 @@ fprintf('Joint types: %s | FK frames: %d (last = %s)\n', ...
 [radFit, radInfo] = fitSphereRadii(model);
 disp(radInfo);
 writetable(radInfo, fullfile(cfg.outDir, 'task2_sphere_radii.csv'));
-fprintf('robotConfig radii: %s
-fitted (p99)     : %s
-', mat2str(rc.sphereRadius, 3), mat2str(radFit, 3));
+fprintf('robotConfig radii: %s\nfitted (p99)     : %s\n', mat2str(rc.sphereRadius, 3), mat2str(radFit, 3));
 
 rng(0);
 result = runPipeline(model, scene, cfg);

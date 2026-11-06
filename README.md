@@ -77,13 +77,16 @@ Bug fixes:
 Additional features:
 - **STOMP extensions** (`runSTOMP`, switched by `cfg`, ablation in `Bonus_STOMPExtensions`):
   - *Joint limits*: the original STOMP ignores them, and planned trajectories left the limits
-    by up to 0.45 rad (Task 5, Panda). Noisy samples and every update are now projected into
-    the limits (as the joint-limit filter of ROS stomp_moveit); success rate unchanged.
-  - *Sample reuse*: the 5 cheapest samples of the previous iteration take part in the next
-    update; their costs are already known, so no extra FK. Median iterations drop by 20-60 %
-    (e.g. Task 4 S1 120 -> 53, Task 5 with constraint 200 -> 116), success rate unchanged.
+    by up to 0.52 rad (30 deg; Task 5, Panda). Noisy samples and every update are now projected
+    into the limits (as the joint-limit filter of ROS stomp_moveit). Projection alone makes the
+    tightest scenes harder (Task 4 S3 2/5, Task 5 with constraint 4/5 collision-free) ...
+  - *Sample reuse*: ... which reuse fixes: the 5 cheapest samples of the previous iteration take
+    part in the next update (their costs are already known, so no extra FK). Limits + reuse:
+    every scene 5/5, zero violations, and fewer iterations than limits alone (Task 4 S3
+    147 -> 85, S1 64 -> 43, Task 5 with constraint 200 -> 162).
   - *Exploration-noise decay* (optional, off): shrinking the noise every iteration made the
-    harder scenes fail (Task 4 S1 0/5, S3 2/5) -- kept as a documented negative result.
+    harder scenes fail (Task 4 S1 2/5, S3 2/5) -- kept as a documented negative result.
+  (Numbers: `Bonus_STOMPExtensions/results/bonus_ablation.csv`, 5 seeds per scene and variant.)
 - **Joint-angle discontinuity**: continuous joints are interpolated along the shortest angle
   (`initTrajectory`). Demo with the Kinova base turning 2.8 -> -2.8 rad: the naive line turns
   it 5.6 rad the long way round (EE path 3.3 m), the shortest-angle line 0.68 rad (0.85 m).

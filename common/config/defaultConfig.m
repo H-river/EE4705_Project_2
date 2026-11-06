@@ -17,8 +17,9 @@ cfg.convergencePatience  = 3;     % stop after this many CONSECUTIVE |dQ| < thre
 
 %% STOMP extensions (see runSTOMP; false / false / 0 / 1 = original algorithm).
 % Chosen from Bonus_STOMPExtensions/stompAblation (7 scenes x 5 seeds): the limits remove
-% violations of up to 0.45 rad at no loss of success; reusing 5 samples cuts the median
-% iterations by 20-60 %; noise decay ALONE made T4 S1/S3 fail (0/5, 2/5) -> off.
+% violations of up to 0.52 rad; limits + reuse of 5 samples: every scene 5/5 with fewer
+% iterations than limits alone (T4 S3 147 -> 85); noise decay ALONE made T4 S1/S3 fail
+% (2/5, 2/5) -> off.
 cfg.shortestAngleInit    = true;  % continuous joints: straight line along the shortest angle
 cfg.enforceJointLimits   = true;  % project samples and the updated trajectory into the limits
 cfg.nReuse               = 5;     % cheapest samples of the previous iteration reused per iteration
