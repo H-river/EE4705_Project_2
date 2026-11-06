@@ -49,7 +49,7 @@ end
 % Result files (figures / tables / videos), relative paths like Task4_Scenarios/results/x.png
 resFiles = {};
 if includeResults
-    [~, tCommit] = system(sprintf('git -C "%s" log -1 --format=%%ct -- "*.m"', root));
+    [~, tCommit] = system(sprintf('git -C "%s" log -1 --format=%%ct -- "*.m" ":(exclude)tools"', root));
     tCommit = str2double(strtrim(tCommit));                       % newest code commit, unix time
     d = [dir(fullfile(root, 'Task*')); dir(fullfile(root, 'Bonus*'))];
     names = [{d([d.isdir]).name}, {'Videos'}];                    % folders with a results/
