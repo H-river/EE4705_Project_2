@@ -7,7 +7,9 @@ function result = runPipeline(model, scene, cfg)
 % result = runSTOMP output plus:
 %   .initInCollision          true if the straight-line init collides (Task 4 requirement)
 %   .inCollision              per-waypoint collision flags of the planned trajectory
-%   .isTrajectoryInCollision
+%   .inCollisionBetween       per-segment flags: collision BETWEEN waypoints i and i+1
+%                             (cfg.denseCheckSubsteps sub-steps, checkTrajCollisionDense)
+%   .isTrajectoryInCollision  true if any waypoint OR any sub-step collides
 %   .world, .scene, .cfg, .modelName, .fkMode
 
 if ~exist(cfg.outDir, 'dir'), mkdir(cfg.outDir); end
@@ -29,9 +31,13 @@ result = runSTOMP(model, q0, qT, voxel_world, cfg);
 initFlags = checkTrajCollision(model.robot, result.thetaInit, world);
 result.initInCollision = any(initFlags);
 result.inCollision = checkTrajCollision(model.robot, result.theta, world);
-result.isTrajectoryInCollision = any(result.inCollision);
-fprintf('[%s] init collides: %d | result collides: %d | iters: %d | time: %.2f s\n', ...
-    tag, result.initInCollision, result.isTrajectoryInCollision, result.nIter, result.totalTime);
+nSub = 10;
+if isfield(cfg, 'denseCheckSubsteps') && ~isempty(cfg.denseCheckSubsteps), nSub = cfg.denseCheckSubsteps; end
+result.inCollisionBetween = checkTrajCollisionDense(model.robot, result.theta, world, nSub);
+result.isTrajectoryInCollision = any(result.inCollision) || any(result.inCollisionBetween);
+fprintf(['[%s] init collides: %d | result collides: %d (waypoints %d, between waypoints %d) ' ...
+         '| iters: %d | time: %.2f s\n'], tag, result.initInCollision, result.isTrajectoryInCollision, ...
+    any(result.inCollision), any(result.inCollisionBetween), result.nIter, result.totalTime);
 
 %% Videos / animation
 if cfg.recordTrainingVideo

@@ -19,6 +19,7 @@ end
 cfg = defaultConfig();
 cfg.fkMode       = 'getTransform';
 cfg.sphereRadius = rc.sphereRadius;
+cfg.safetyMargin = rc.safetyMargin;
 cfg.outDir       = fullfile(thisDir, 'results');
 
 model = buildRobotModel(rc.robotName, rc.eeName, cfg.fkMode);
@@ -29,6 +30,14 @@ scene = scene_newrobot_base();
 fprintf('Movable joints (%d): %s\n', model.nJoints, strjoin(model.jointBodyNames, ', '));
 fprintf('Joint types: %s | FK frames: %d (last = %s)\n', ...
     strjoin(unique(model.jointTypes), ', '), model.nFK, model.fkBodyNames{end});
+
+% Collision-sphere radii: re-fit them to the meshes and compare with robotConfig
+[radFit, radInfo] = fitSphereRadii(model);
+disp(radInfo);
+writetable(radInfo, fullfile(cfg.outDir, 'task2_sphere_radii.csv'));
+fprintf('robotConfig radii: %s
+fitted (p99)     : %s
+', mat2str(rc.sphereRadius, 3), mat2str(radFit, 3));
 
 rng(0);
 result = runPipeline(model, scene, cfg);

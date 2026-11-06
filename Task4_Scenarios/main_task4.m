@@ -8,7 +8,8 @@
 % For every scenario:
 %   1. one "showcase" run through runPipeline (rng 0): figures, .mat, optional video;
 %   2. a robustness study: STOMP from the same start/goal with nSeeds
-%      different seeds, success = mesh-based collision check finds no collision.
+%      different seeds, success = mesh-based collision check finds no collision, at
+%      the waypoints and at the sub-steps between them.
 % Outputs (Task4_Scenarios/results/): task4_summary.csv, task4_seeds.csv,
 % task4_<scene>_overlay.png, task4_cost.png, runPipeline .mat (+ .avi if makeVideos).
 
@@ -23,6 +24,7 @@ rc = robotConfig();
 cfg = defaultConfig();
 cfg.fkMode       = 'PoE';
 cfg.sphereRadius = rc.sphereRadius;
+cfg.safetyMargin = rc.safetyMargin;
 cfg.outDir       = fullfile(thisDir, 'results');
 cfg.displayAnimation  = false;
 cfg.recordResultVideo = makeVideos;
@@ -68,7 +70,8 @@ for s = 1:nS
         rng(k);
         evalc('r = runSTOMP(model, q0, qT, voxel_world, cfgR);');   % silence per-run prints
         c = checkTrajCollision(model.robot, r.theta, res.world);
-        ok(k) = ~any(c);  nColl(k) = nnz(c);  it(k) = r.nIter;  tt(k) = r.totalTime;
+        cb = checkTrajCollisionDense(model.robot, r.theta, res.world, cfg.denseCheckSubsteps);
+        ok(k) = ~any(c) && ~any(cb);  nColl(k) = nnz(c);  it(k) = r.nIter;  tt(k) = r.totalTime;
     end
     fprintf('[%s] robustness: %d/%d seeds collision-free | median iters %g | median time %.1f s\n', ...
         scene.name, nnz(ok), nSeeds, median(it), median(tt));

@@ -15,6 +15,7 @@ rc = robotConfig();
 cfg = defaultConfig();
 cfg.fkMode       = 'PoE';                     % Task-3 FK, ~13x faster sweep than getTransform
 cfg.sphereRadius = rc.sphereRadius;
+cfg.safetyMargin = rc.safetyMargin;
 cfg.maxIter      = 200;                       % 50 stopped every constrained run early
                                               % (some still colliding); 200 as in Task 4
 cfg.outDir       = fullfile(thisDir, 'results');
@@ -70,7 +71,8 @@ for i = 1:nW
         meanTilt(i, s) = mean(ang);
         pathLenS(i, s) = eePathLength(model, res.theta);
         nIterS(i, s)   = res.nIter;
-        collideS(i, s) = any(checkTrajCollision(model.robot, res.theta, wld));
+        collideS(i, s) = any(checkTrajCollision(model.robot, res.theta, wld)) || ...
+                         any(checkTrajCollisionDense(model.robot, res.theta, wld, cfg.denseCheckSubsteps));
     end
     fprintf('w_con = %5g | max tilt: median %6.2f, worst %6.2f deg | collision-free %d/%d | median iters %g\n', ...
         wList(i), median(maxTilt(i, :)), max(maxTilt(i, :)), nnz(~collideS(i, :)), nS, median(nIterS(i, :)));

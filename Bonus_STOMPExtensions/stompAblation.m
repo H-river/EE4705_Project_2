@@ -8,7 +8,8 @@ function [tbl, raw] = stompAblation(outDir, seeds)
 %   +decay        : + exploration noise x 0.98^(iter-1) (floor 0.1)   [without reuse]
 %   +reuse+decay  : both
 % Scenes: Task 1 (Kinova), Task 2, Task 4 S1-S3, Task 5 without / with the constraint.
-% Every (scene, variant) pair runs the same seeds; success = mesh-based collision check.
+% Every (scene, variant) pair runs the same seeds; success = mesh-based collision check
+% at the waypoints and between them (checkTrajCollisionDense).
 %
 % Outputs: bonus_ablation.csv (one row per scene x variant), bonus_ablation_runs.csv
 % (one row per run), bonus_ablation.png.
@@ -51,7 +52,7 @@ for s = 1:size(S, 1)
         c = base;
         f = fieldnames(V{v, 2});
         for i = 1:numel(f), c.(f{i}) = V{v, 2}.(f{i}); end
-        if strcmp(S{s, 2}, 'panda'), c.sphereRadius = rc.sphereRadius; end
+        if strcmp(S{s, 2}, 'panda'), c.sphereRadius = rc.sphereRadius;  c.safetyMargin = rc.safetyMargin; end
         c.maxIter = S{s, 4};
         c.useEEConstraint = S{s, 5} > 0;  c.w_con = S{s, 5};
         for k = 1:numel(seeds)
@@ -59,7 +60,9 @@ for s = 1:size(S, 1)
             evalc('r = runSTOMP(model, q0, qT, vw, c);');          % silence per-iteration prints
             viol = max([r.theta - hi; lo - r.theta], [], 'all');
             raw = [raw; table(string(S{s, 1}), string(V{v, 1}), seeds(k), ...
-                ~any(checkTrajCollision(model.robot, r.theta, world)), max(viol, 0), ...
+                ~any(checkTrajCollision(model.robot, r.theta, world)) && ...
+                ~any(checkTrajCollisionDense(model.robot, r.theta, world, c.denseCheckSubsteps)), ...
+                max(viol, 0), ...
                 r.nIter, r.totalTime, maxTilt(model, r.theta), ...
                 'VariableNames', {'scene', 'variant', 'seed', 'collisionFree', 'limitViolation_rad', ...
                                   'nIter', 'time_s', 'maxTilt_deg'})]; %#ok<AGROW>

@@ -28,7 +28,7 @@ T5-3 画图函数 ──► 所有 Task 的报告图
 | T1-6b | `runSTOMP.m` 和 `stompTrajCost.m` | **Bug**：控制代价多加了跨关节项，应改成 trace | ✅ |
 | T1-7 | `Task1_Kinova/main_task1.m` | Task 1 的报告图 | ✅ |
 | T2-1 | `common/config/robotConfig.m` | **选机器人**（外部 URDF 要处理 mesh 路径，见 T2-1b） | ✅ |
-| T2-2 | `robotConfig.m`、`stompRobotSphere.m` | 碰撞球半径（可以每段 link 单独设）、检查覆盖 | 🟡 覆盖图已出（`task2_spheres.png`）：5 cm 球大多在连杆网格内侧，靠 5 cm safetyMargin 补偿，网格碰撞检测全部通过；半径没按连杆调 |
+| T2-2 | `robotConfig.m`、`stompRobotSphere.m` | 碰撞球半径（可以每段 link 单独设）、检查覆盖 | ✅ 半径按连杆拟合到碰撞网格（`fitSphereRadii`，99% 分位，0.10–0.155 m），safetyMargin 改为 2 cm；原来的 5 cm 球在网格内侧 |
 | T2-3 | `common/robot/solveInitFinal.m` | 有移动关节时别做 wrapToPi（已按关节类型处理，需要验证） | ✅ |
 | T2-4 | `common/scenes/scene_newrobot_base.m` | 新机器人的起止位姿、障碍物、envSize | ✅ |
 | T2-5/6 | `Task2_NewRobot/main_task2.m` | 关节和碰撞球的检查图、报告图 | ✅ |

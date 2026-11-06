@@ -16,8 +16,8 @@ Each task has one entry script. Open it and press **Run** — it adds `common/` 
 | Task | Entry script | What it shows | FK |
 |---|---|---|---|
 | 1 | `Task1_Kinova/main_task1.m` | Kinova Gen3, original scenario, animation | `getTransform` |
-| 2 | `Task2_NewRobot/main_task2.m` | Franka Emika Panda (`common/config/robotConfig.m`) in a Task-1-like scene; collision-sphere coverage plot | `getTransform` |
-| 3 | `Task3_PoE/main_task3.m` | Screw-axis table, PoE accuracy/speed vs `getTransform` (`compareFK.m`), same-seed planning with both | PoE vs `getTransform` |
+| 2 | `Task2_NewRobot/main_task2.m` | Franka Emika Panda (`common/config/robotConfig.m`) in a Task-1-like scene; collision-sphere radii fitted to the meshes + coverage plot | `getTransform` |
+| 3 | `Task3_PoE/main_task3.m` | Screw-axis table + figure, PoE accuracy/speed vs `getTransform` (`compareFK.m`), same-seed planning with both | PoE vs `getTransform` |
 | 4 | `Task4_Scenarios/main_task4.m` | Three custom multi-obstacle scenarios + 10-seed robustness study | PoE |
 | 5 | `Task5_EEConstraint/main_task5.m` | EE y-axis kept upright: weight sweep, then with vs. without constraint | PoE |
 | Bonus | `Bonus_STOMPExtensions/main_bonus.m` | Joint-angle wrap demo (Kinova) + ablation of the STOMP extensions on all scenes (~15 min) | PoE |
@@ -92,8 +92,17 @@ Additional features:
   frames. Same result as `getTransform` to ~1e-15, FK ~35x faster, STOMP iteration ~13x faster;
   screw axes cross-checked with the matrix logarithm.
 - **Multi-obstacle voxelisation**: boxes (optionally rotated), spheres and upright cylinders.
-- **Ground-truth collision check** with the robot meshes (`checkTrajCollision`), independent of
-  the sphere model STOMP optimises.
+- **Ground-truth collision check** with the robot meshes, independent of the sphere model
+  STOMP optimises: at every waypoint (`checkTrajCollision`) and also at 9 joint-space sub-steps
+  between consecutive waypoints (`checkTrajCollisionDense`), because the robot moves
+  continuously. A result counts as collision-free only if both pass.
+- **Collision spheres fitted to the robot meshes** (`Task2_NewRobot/fitSphereRadii`): one radius
+  per link = 99th percentile of the mesh-vertex distance to the link's sphere segment over 200
+  random configurations (Panda: 0.10-0.155 m). The first version used 0.05 m everywhere; the
+  coverage plot showed those spheres inside the links, i.e. only the 5 cm safety margin kept the
+  arm clear. With fitted radii the safety margin is a real 2 cm margin.
+- **Screw-axis figure** (`Task3_PoE/plotScrewAxes`): every S_i drawn on the robot at the zero
+  configuration, with a consistency check of omega x v against the joint origin.
 - **Robustness studies**: Task 4 runs each scenario with 10 seeds; Task 5 sweeps the
   constraint weight over 5 seeds per weight and picks it automatically.
 - **Convergence patience** (`cfg.convergencePatience`): stop only after several consecutive

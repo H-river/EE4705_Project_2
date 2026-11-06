@@ -39,6 +39,9 @@ cfg.worldAxis       = [0; 0; 1];  % target direction in world frame (upright)
 %% Kinematics
 cfg.fkMode = 'getTransform';      % 'getTransform' (Task 1/2) | 'PoE' (Task 3+)
 
+%% Ground-truth check (mesh-based checkCollision, independent of the sphere model)
+cfg.denseCheckSubsteps  = 10;     % also check nSub-1 joint-space sub-steps between waypoints
+
 %% Visualisation / output
 cfg.displayAnimation    = true;
 cfg.recordTrainingVideo = false;

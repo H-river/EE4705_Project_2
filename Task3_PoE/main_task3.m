@@ -7,7 +7,7 @@
 %   4. this script      : full STOMP run with PoE vs getTransform on the Task-2 robot,
 %                         same seed -> same trajectory, per-iteration timing
 %
-% Outputs (Task3_PoE/results/): screw-axis CSVs, fk_compare.csv, plan_compare.csv,
+% Outputs (Task3_PoE/results/): screw-axis CSVs + figures (task3_screw_axes_*.png), fk_compare.csv, plan_compare.csv,
 % task3_cost.png, task3_overlay.png, and the usual runPipeline .mat files.
 
 clear; clc; close all;
@@ -19,10 +19,10 @@ useKinova = false;   % true = prototype on Kinova; false = Task-2 robot (robotCo
 rc = robotConfig();
 if useKinova || ~rc.isDecided
     robotName = 'kinovaGen3';  eeName = 'EndEffector_Link';  scene = scene_kinova_default();
-    sphereRadius = 0.05;
+    sphereRadius = 0.05;  safetyMargin = 0.05;
 else
     robotName = rc.robotName;  eeName = rc.eeName;  scene = scene_newrobot_base();
-    sphereRadius = rc.sphereRadius;
+    sphereRadius = rc.sphereRadius;  safetyMargin = rc.safetyMargin;
 end
 outDir = fullfile(thisDir, 'results');
 if ~exist(outDir, 'dir'), mkdir(outDir); end
@@ -31,9 +31,13 @@ if ~exist(outDir, 'dir'), mkdir(outDir); end
 rng(1);
 screwAxisTable(buildRobotModel(robotName, eeName, 'PoE'), ...
                fullfile(outDir, ['screw_axes_' robotName '.csv']));
+plotScrewAxes(buildRobotModel(robotName, eeName, 'PoE'), ...
+              fullfile(outDir, ['task3_screw_axes_' robotName '.png']));
 if ~strcmp(robotName, 'kinovaGen3')
     screwAxisTable(buildRobotModel('kinovaGen3', 'EndEffector_Link', 'PoE'), ...
                    fullfile(outDir, 'screw_axes_kinovaGen3.csv'));
+    plotScrewAxes(buildRobotModel('kinovaGen3', 'EndEffector_Link', 'PoE'), ...
+                  fullfile(outDir, 'task3_screw_axes_kinovaGen3.png'));
 end
 
 %% 2) FK accuracy / speed check (must pass before planning)
@@ -48,6 +52,7 @@ assert(all([fkStats.maxPosErr] < 1e-10) && all([fkStats.maxRotErr] < 1e-10), ...
 %% 3) Plan with PoE and with getTransform on the same scene and the same seed
 cfg = defaultConfig();
 cfg.sphereRadius     = sphereRadius;
+cfg.safetyMargin     = safetyMargin;
 cfg.outDir           = outDir;
 cfg.displayAnimation = false;
 
