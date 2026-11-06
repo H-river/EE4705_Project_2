@@ -21,6 +21,7 @@ cfg.fkMode       = 'getTransform';
 cfg.sphereRadius = rc.sphereRadius;
 cfg.safetyMargin = rc.safetyMargin;
 cfg.outDir       = fullfile(thisDir, 'results');
+if ~exist(cfg.outDir, 'dir'), mkdir(cfg.outDir); end
 
 model = buildRobotModel(rc.robotName, rc.eeName, cfg.fkMode);
 scene = scene_newrobot_base();
