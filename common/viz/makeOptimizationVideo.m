@@ -30,11 +30,15 @@ for i = 1:numel(result.world)
     set(p, 'LineStyle', 'none', 'FaceColor', [0.85 0.20 0.15], 'FaceAlpha', 0.45);
 end
 P0 = eePositions(model, TH{1});
-plot3(ax, P0(1, :), P0(2, :), P0(3, :), ':', 'Color', [0.4 0.4 0.4], 'LineWidth', 1.5);
-plot3(ax, P0(1, 1), P0(2, 1), P0(3, 1), 'o', 'MarkerSize', 9, 'MarkerFaceColor', [0.20 0.70 0.25], 'MarkerEdgeColor', 'k');
-plot3(ax, P0(1, end), P0(2, end), P0(3, end), 's', 'MarkerSize', 9, 'MarkerFaceColor', [0.90 0.15 0.15], 'MarkerEdgeColor', 'k');
+hInit = plot3(ax, P0(1, :), P0(2, :), P0(3, :), ':', 'Color', [0.4 0.4 0.4], 'LineWidth', 1.5);
+hS = plot3(ax, P0(1, 1), P0(2, 1), P0(3, 1), 'o', 'MarkerSize', 9, 'MarkerFaceColor', [0.20 0.70 0.25], 'MarkerEdgeColor', 'k');
+hG = plot3(ax, P0(1, end), P0(2, end), P0(3, end), 's', 'MarkerSize', 9, 'MarkerFaceColor', [0.90 0.15 0.15], 'MarkerEdgeColor', 'k');
 hOld = gobjects(0);
+hOldKey = plot3(ax, NaN, NaN, NaN, '-', 'Color', [0.75 0.75 0.75], 'LineWidth', 0.8);   % legend entry only
 hCur = plot3(ax, NaN, NaN, NaN, '-o', 'Color', [0.05 0.05 0.05], 'LineWidth', 2.2, 'MarkerSize', 3);
+legend(ax, [hCur, hOldKey, hInit, hS, hG], {'EE path, current iteration', 'earlier iterations', ...
+    'initial guess (straight line in joint space)', 'start', 'goal'}, ...
+    'Location', 'northeast', 'FontSize', 8, 'AutoUpdate', 'off');
 axis(ax, result.scene.axisLimits);
 view(ax, result.scene.viewAngle(1), result.scene.viewAngle(2));
 grid(ax, 'on');  xlabel(ax, 'x [m]');  ylabel(ax, 'y [m]');  zlabel(ax, 'z [m]');

@@ -36,17 +36,25 @@ for k = 1:K
     Q{k} = densify(r.theta, subSteps);
     P{k} = eePositions(model, Q{k});
     ax(k) = nexttile(tl);  hold(ax(k), 'on');
+    hObs = gobjects(0);
     for i = 1:numel(r.world)                                   % obstacles
         [~, p] = show(r.world{i}, 'Parent', ax(k));
         set(p, 'LineStyle', 'none', 'FaceColor', [0.85 0.20 0.15], 'FaceAlpha', 0.45);
+        if i == 1, hObs = p; end
     end
-    Pinit = eePositions(model, r.thetaInit);                   % straight-line initial guess
-    plot3(ax(k), Pinit(1, :), Pinit(2, :), Pinit(3, :), ':', 'Color', [0.45 0.45 0.45], 'LineWidth', 1.2);
-    plot3(ax(k), P{k}(1, 1), P{k}(2, 1), P{k}(3, 1), 'o', 'MarkerSize', 9, ...
+    % EE path of the INITIAL guess: a straight line in JOINT space (linspace q0 -> qT), which
+    % is a curve in Cartesian space. STOMP starts from it; it collides by design.
+    Pinit = eePositions(model, r.thetaInit);
+    hInit = plot3(ax(k), Pinit(1, :), Pinit(2, :), Pinit(3, :), ':', 'Color', [0.45 0.45 0.45], 'LineWidth', 1.5);
+    hS = plot3(ax(k), P{k}(1, 1), P{k}(2, 1), P{k}(3, 1), 'o', 'MarkerSize', 9, ...
         'MarkerFaceColor', [0.20 0.70 0.25], 'MarkerEdgeColor', 'k');
-    plot3(ax(k), P{k}(1, end), P{k}(2, end), P{k}(3, end), 's', 'MarkerSize', 9, ...
+    hG = plot3(ax(k), P{k}(1, end), P{k}(2, end), P{k}(3, end), 's', 'MarkerSize', 9, ...
         'MarkerFaceColor', [0.90 0.15 0.15], 'MarkerEdgeColor', 'k');
+    % EE path of the PLANNED trajectory, drawn as the robot moves
     trail(k) = plot3(ax(k), NaN, NaN, NaN, '-', 'Color', [0.1 0.1 0.1], 'LineWidth', 2);
+    legend(ax(k), [trail(k), hInit, hS, hG, hObs], {'planned EE path (STOMP result)', ...
+        'initial guess (straight line in joint space)', 'start', 'goal', 'obstacle'}, ...
+        'Location', 'northeast', 'FontSize', 8, 'AutoUpdate', 'off');
     axis(ax(k), r.scene.axisLimits);
     view(ax(k), r.scene.viewAngle(1), r.scene.viewAngle(2));
     grid(ax(k), 'on');  xlabel(ax(k), 'x [m]');  ylabel(ax(k), 'y [m]');  zlabel(ax(k), 'z [m]');
