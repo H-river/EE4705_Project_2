@@ -20,6 +20,7 @@ Each task has one entry script. Open it and press **Run** — it adds `common/` 
 | 3 | `Task3_PoE/main_task3.m` | Screw-axis table, PoE accuracy/speed vs `getTransform` (`compareFK.m`), same-seed planning with both | PoE vs `getTransform` |
 | 4 | `Task4_Scenarios/main_task4.m` | Three custom multi-obstacle scenarios + 10-seed robustness study | PoE |
 | 5 | `Task5_EEConstraint/main_task5.m` | EE y-axis kept upright: weight sweep, then with vs. without constraint | PoE |
+| Bonus | `Bonus_STOMPExtensions/main_bonus.m` | Joint-angle wrap demo (Kinova) + ablation of the STOMP extensions on all scenes (~15 min) | PoE |
 
 Outputs (`.mat`, figures, `.csv` tables, optional videos) go to each task's `results/` folder,
 which is created on the first run. All runs are seeded (`rng`), so they are reproducible.
@@ -66,13 +67,26 @@ Bug fixes:
   `theta_animation` when the iteration count was a multiple of 5.
 - The zero-gradient stop test used `sum(...) == 0` (positive and negative entries can cancel).
 - Kinova: `EndEffector_Link` was not among the frames, so the last link had no collision spheres.
-- Prismatic joints were wrapped to [-pi, pi] (`solveInitFinal` now checks the joint type).
+- Prismatic joints, and revolute joints whose limits reach beyond pi (Panda joint 6:
+  [-0.02, 3.75]), were wrapped to [-pi, pi]; now only continuous joints are wrapped.
 - An obstacle partly outside the voxel world made `sub2ind` error (`buildVoxelWorld` clamps).
 - Coincident frames (Panda link1/link2, link5/link6) have length 0 with `getTransform` but
   ~1e-17 with PoE; `ceil` then changed the number of collision spheres between waypoints and
   `stompTrajCost` crashed (`stompRobotSphere` now uses a small tolerance).
 
 Additional features:
+- **STOMP extensions** (`runSTOMP`, switched by `cfg`, ablation in `Bonus_STOMPExtensions`):
+  - *Joint limits*: the original STOMP ignores them, and planned trajectories left the limits
+    by up to 0.45 rad (Task 5, Panda). Noisy samples and every update are now projected into
+    the limits (as the joint-limit filter of ROS stomp_moveit); success rate unchanged.
+  - *Sample reuse*: the 5 cheapest samples of the previous iteration take part in the next
+    update; their costs are already known, so no extra FK. Median iterations drop by 20-60 %
+    (e.g. Task 4 S1 120 -> 53, Task 5 with constraint 200 -> 116), success rate unchanged.
+  - *Exploration-noise decay* (optional, off): shrinking the noise every iteration made the
+    harder scenes fail (Task 4 S1 0/5, S3 2/5) -- kept as a documented negative result.
+- **Joint-angle discontinuity**: continuous joints are interpolated along the shortest angle
+  (`initTrajectory`). Demo with the Kinova base turning 2.8 -> -2.8 rad: the naive line turns
+  it 5.6 rad the long way round (EE path 3.3 m), the shortest-angle line 0.68 rad (0.85 m).
 - **PoE forward kinematics** (`computeScrewAxes`, `fkPoE`): screw axes computed once at the
   zero configuration; one running product with closed-form Rodrigues exponentials gives all
   frames. Same result as `getTransform` to ~1e-15, FK ~35x faster, STOMP iteration ~13x faster;

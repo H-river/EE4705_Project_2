@@ -15,6 +15,16 @@ cfg.h                    = 10;    % sensitivity in exp(-h * normalised cost), Eq
 cfg.sigmaScale           = 1.5;   % exploration scale applied to normalised R^-1
 cfg.convergencePatience  = 3;     % stop after this many CONSECUTIVE |dQ| < threshold (1 = original rule)
 
+%% STOMP extensions (see runSTOMP; false / false / 0 / 1 = original algorithm).
+% Chosen from Bonus_STOMPExtensions/stompAblation (7 scenes x 5 seeds): the limits remove
+% violations of up to 0.45 rad at no loss of success; reusing 5 samples cuts the median
+% iterations by 20-60 %; noise decay ALONE made T4 S1/S3 fail (0/5, 2/5) -> off.
+cfg.shortestAngleInit    = true;  % continuous joints: straight line along the shortest angle
+cfg.enforceJointLimits   = true;  % project samples and the updated trajectory into the limits
+cfg.nReuse               = 5;     % cheapest samples of the previous iteration reused per iteration
+cfg.noiseDecay           = 1;     % exploration covariance x noiseDecay^(iter-1) ...
+cfg.noiseMinScale        = 0.1;   % ... but never below this fraction of the initial one
+
 %% Obstacle cost (Eq. 13)
 cfg.safetyMargin = 0.05;          % epsilon in Eq. (13) [m] (was hard-coded in stompObstacleCost)
 cfg.sphereRadius = 0.05;          % scalar, or 1 x nFK vector (one radius per link)

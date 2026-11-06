@@ -10,6 +10,8 @@ function model = buildRobotModel(robotName, eeName, fkMode)
 %   .fkBodyNames     1 x nFK cell = [jointBodyNames, eeName]; row k of X / cell k of T
 %   .nJoints, .nFK
 %   .jointTypes      1 x nJoints cell, 'revolute' | 'prismatic' | 'continuous'
+%   .jointLimits     nJoints x 2 position limits [lower upper] (Joint.PositionLimits)
+%   .isContinuous    1 x nJoints logical, revolute joint without finite limits (Kinova 1/3/5/7)
 %   .fkMode          'getTransform' | 'PoE'
 %   .S               6 x nJoints space screw axes      (PoE only, from computeScrewAxes)
 %   .Mhome           4 x 4 x nFK home poses of fkBodies (PoE only, from computeScrewAxes)
@@ -82,6 +84,15 @@ end
 model.jointBodyNames = model.robot.BodyNames(isMovable);
 model.jointTypes     = jointTypes(isMovable);
 model.nJoints        = numel(model.jointBodyNames);
+
+%% Joint limits (runSTOMP keeps the trajectory inside them) and continuous joints
+% (unlimited revolute joints: the only ones that may be wrapped to [-pi, pi] and that
+% need shortest-angle interpolation in initTrajectory).
+model.jointLimits = zeros(model.nJoints, 2);
+for k = 1:model.nJoints
+    model.jointLimits(k, :) = getBody(model.robot, model.jointBodyNames{k}).Joint.PositionLimits;
+end
+model.isContinuous = ~strcmp(model.jointTypes, 'prismatic') & any(isinf(model.jointLimits), 2)';
 
 nCfg = numel(homeConfiguration(model.robot));
 assert(model.nJoints == nCfg, ...

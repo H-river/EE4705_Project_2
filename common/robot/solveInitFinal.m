@@ -32,18 +32,26 @@ else
 end
 
 rng(rngState);
-%% Wrap continuous / revolute joints into [-pi, pi]; prismatic joints are NOT wrapped
-% (bug fix: the original code called wrapToPi on the whole vector).
-isAngular = ~strcmp(model.jointTypes, 'prismatic')';
-q0(isAngular) = wrapToPi(q0(isAngular));
-qT(isAngular) = wrapToPi(qT(isAngular));
+%% Wrap only CONTINUOUS (unlimited revolute) joints into [-pi, pi].
+% Bug fixes: the original called wrapToPi on the whole vector, which is wrong for
+% prismatic joints, and also for revolute joints whose limits reach beyond pi (Panda
+% joint 6: [-0.02, 3.75] -- wrapping 3.5 to -2.78 would leave the limits). IK already
+% returns limited joints inside their limits, so they are left untouched.
+if isfield(model, 'isContinuous')
+    isWrap = model.isContinuous(:);
+else
+    isWrap = ~strcmp(model.jointTypes, 'prismatic')';
+end
+q0(isWrap) = wrapToPi(q0(isWrap));
+qT(isWrap) = wrapToPi(qT(isWrap));
 
 %% Goal pose for plotting
 Tgoal = getTransform(model.robot, qT, model.eeName);
 poseFinal = [Tgoal(1:3, 4); rotm2eul(Tgoal(1:3, 1:3), 'XYZ')'];
 
 %% Sanity check: IK accuracy (IK may silently fail for unreachable poses)
-if isfield(scene, 'taskFinal') && ~isempty(scene.taskFinal)
+usedIK = ~(isfield(scene, 'qT') && ~isempty(scene.qT));    % qT given in joint space -> no IK to check
+if usedIK && isfield(scene, 'taskFinal') && ~isempty(scene.taskFinal)
     err = norm(Tgoal(1:3, 4) - scene.taskFinal(1:3, 4));
     if err > 1e-3
         warning('solveInitFinal: goal IK position error = %.4f m (unreachable pose?)', err);

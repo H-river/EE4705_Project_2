@@ -61,9 +61,10 @@ T5-3 画图函数 ──► 所有 Task 的报告图
 | T5-4 | — | 整合报告（每人写自己的部分 + 贡献说明）、整合 slides | ⬜ |
 
 ## 加分项（谁有空谁做，报告里明确写出来）
-- OPT-1 `initTrajectory.m`：连续关节按最短角度插值。
+- ✅ OPT-1 `initTrajectory.m`：连续关节按最短角度插值（演示：`Bonus_STOMPExtensions/demoAngleWrap.m`）。
+- ✅ STOMP 改进：关节限位投影、采样复用（默认开）、噪声衰减（默认关，负结果）；对比实验 `Bonus_STOMPExtensions/stompAblation.m`。
 - `runSTOMP` 里对每个采样的代价计算改用 `parfor`。
-- 多随机种子的成功率统计（T4-3）。
+- ✅ 多随机种子的成功率统计（T4-3）。
 
 ## 框架里已经修好的问题（报告"改进"一节可以直接引用）
 - 视频段：关闭录制时仍会建空 avi；`k+1` 索引越界。
