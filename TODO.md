@@ -32,7 +32,7 @@ T5-3 画图函数 ──► 所有 Task 的报告图
 | T2-3 | `common/robot/solveInitFinal.m` | 有移动关节时别做 wrapToPi（已按关节类型处理，需要验证） | ✅ |
 | T2-4 | `common/scenes/scene_newrobot_base.m` | 新机器人的起止位姿、障碍物、envSize | ✅ |
 | T2-5/6 | `Task2_NewRobot/main_task2.m` | 关节和碰撞球的检查图、报告图 | ✅ |
-| FW | 根目录 | README 定稿；用全新 MATLAB 环境跑一遍复现检查；打包 zip | 🟡 README 已定稿；打包用 `tools/make_submission.m`（排除 TODO.md 和 tools/，自动加报告 PDF）；还差报告 PDF |
+| FW | 根目录 | README 定稿；用全新 MATLAB 环境跑一遍复现检查；打包 zip | ✅ 干净副本复现通过（Task 1–5、Bonus、视频）；打包：MATLAB 里 `addpath tools; make_submission('report/Group9_Report.pdf')` |
 
 ## Task 3+4（Jiamo，约 11 h）
 | 编号 | 文件 | 内容 | 状态 |
@@ -58,7 +58,7 @@ T5-3 画图函数 ──► 所有 Task 的报告图
 | T5-2c/d | `main_task5.m`、`plotEEAxisDeviation.m` | 加约束前后对比（每个 waypoint 的偏差角） | ✅ |
 | T5-3a | `common/viz/plotConfigOverlay.m` | 构型叠加图（全组共用） | ✅ |
 | T5-3b | `common/viz/plotCostHistory.m` | 代价曲线（全组共用） | ✅ |
-| T5-4 | — | 整合报告（每人写自己的部分 + 贡献说明）、整合 slides | ⬜ |
+| T5-4 | `report/Group9_Report.docx` | 整合报告（每人写自己的部分 + 贡献说明）、整合 slides | 🟡 完整初稿已出（13 页，数字取自最终结果）：每人审阅、修改自己的章节和贡献表 → 用 Word 导出 `report/Group9_Report.pdf` → 打包；slides 未做 |
 
 ## 加分项（谁有空谁做，报告里明确写出来）
 - ✅ OPT-1 `initTrajectory.m`：连续关节按最短角度插值（演示：`Bonus_STOMPExtensions/demoAngleWrap.m`）。

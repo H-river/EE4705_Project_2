@@ -8,8 +8,9 @@ function zipFile = make_submission(reportPdf, outDir, includeResults)
 % The zip contains one folder, Group9_Report_Code/, with
 %   * every file tracked by git (code, README, original_code/) -- so untracked course PDFs
 %     are left out automatically;
-%   * minus the team-internal files: TODO.md, tools/, .gitignore, .gitattributes;
-%   * plus the report PDF (if given);
+%   * minus the team-internal files: TODO.md, tools/, report/ (editable report source),
+%     .gitignore, .gitattributes;
+%   * plus the report PDF (if given), as Group9_Report.pdf next to the README;
 %   * plus (includeResults, default true) the figures, tables and videos of every
 %     <folder>/results/ (*.png, *.csv, *.mp4 -- not the .mat / .avi files), so the
 %     graders can see the results without running anything. Run all task scripts and
@@ -30,7 +31,8 @@ name = 'Group9_Report_Code';
 if st ~= 0, error('make_submission: git ls-files failed:\n%s', out); end
 files = splitlines(strtrim(out));
 files = files(~cellfun(@isempty, files));
-skip = startsWith(files, 'tools/') | ismember(files, {'TODO.md', '.gitignore', '.gitattributes'});
+skip = startsWith(files, 'tools/') | startsWith(files, 'report/') | ...
+       ismember(files, {'TODO.md', '.gitignore', '.gitattributes'});
 files = files(~skip);
 
 [~, dirty] = system(sprintf('git -C "%s" status --porcelain --untracked-files=no', root));
