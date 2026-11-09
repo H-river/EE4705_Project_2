@@ -2,7 +2,8 @@ function [tbl, raw] = stompAblation(outDir, seeds)
 % STOMPABLATION  Effect of each STOMP extension (runSTOMP) on every project scene.
 %
 % Variants (cumulative, all with PoE FK):
-%   original      : the original algorithm (no joint limits, plain linspace init)
+%   no extensions : no joint limits, plain linspace init. Convergence patience stays at 3;
+%                   P = 1 (the original stopping rule) is compared in compare_patience_all.
 %   +limits       : samples and updates projected into the joint limits, shortest-angle init
 %   +reuse        : + the 5 cheapest samples of the previous iteration are reused
 %   +decay        : + exploration noise x 0.98^(iter-1) (floor 0.1)   [without reuse]
@@ -19,7 +20,7 @@ if nargin < 2 || isempty(seeds), seeds = 1:5; end
 if ~exist(outDir, 'dir'), mkdir(outDir); end
 
 V = {
- 'original',     struct('enforceJointLimits', false, 'shortestAngleInit', false, 'nReuse', 0, 'noiseDecay', 1)
+ 'no extensions', struct('enforceJointLimits', false, 'shortestAngleInit', false, 'nReuse', 0, 'noiseDecay', 1)
  '+limits',      struct('enforceJointLimits', true,  'shortestAngleInit', true,  'nReuse', 0, 'noiseDecay', 1)
  '+reuse',       struct('enforceJointLimits', true,  'shortestAngleInit', true,  'nReuse', 5, 'noiseDecay', 1)
  '+decay',       struct('enforceJointLimits', true,  'shortestAngleInit', true,  'nReuse', 0, 'noiseDecay', 0.98)

@@ -18,7 +18,7 @@ rc.isDecided  = true;
 % fitted to the Panda collision meshes by Task2_NewRobot/fitSphereRadii (99th percentile
 % of the vertex-to-segment distance over 200 random configurations, rounded up to mm).
 % The first version used 0.05 m for every link: the plot task2_spheres.png showed those
-% spheres inside the link meshes (median mesh distance 8-10 cm), so only the 5 cm
+% spheres inside the link meshes (median mesh distance 5.5-9.8 cm), so only the 5 cm
 % safety margin kept the arm away from obstacles. With fitted radii the margin can be a
 % real margin again (2 cm).
 %   segment ends:   link1  link2  link3  link4  link5  link6  link7  tcp

@@ -12,8 +12,9 @@
 %
 %   Part A  demoAngleWrap : Kinova, base joint 2.8 -> -2.8 rad, naive vs shortest-angle init
 %   Part B  stompAblation : every extension on every project scene, several seeds
+%   Part C  compare_patience_all : convergence patience P = 1 vs P = 3 on every scene
 % Outputs: Bonus_STOMPExtensions/results/ (CSV tables + figures). Run time ~15 min,
-% almost all of it Part B (set nSeeds smaller for a quick look).
+% most of it Parts B and C (set nSeeds smaller for a quick look at Part B).
 
 clear; clc; close all;
 thisDir = fileparts(mfilename('fullpath'));
@@ -28,3 +29,7 @@ wrapTbl = demoAngleWrap(outDir);
 %% Part B: ablation of the STOMP extensions
 close all;
 ablTbl = stompAblation(outDir, 1:nSeeds);
+
+%% Part C: convergence patience (this script clears the workspace, so it comes last)
+close all;
+run(fullfile(thisDir, 'compare_patience_all.m'));

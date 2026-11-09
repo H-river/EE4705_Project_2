@@ -15,7 +15,8 @@ cfg.h                    = 10;    % sensitivity in exp(-h * normalised cost), Eq
 cfg.sigmaScale           = 1.5;   % exploration scale applied to normalised R^-1
 cfg.convergencePatience  = 3;     % stop after this many CONSECUTIVE |dQ| < threshold (1 = original rule)
 
-%% STOMP extensions (see runSTOMP; false / false / 0 / 1 = original algorithm).
+%% STOMP extensions (see runSTOMP). false / false / 0 / 1 here plus convergencePatience = 1
+% above = the original algorithm.
 % Chosen from Bonus_STOMPExtensions/stompAblation (7 scenes x 5 seeds): the limits remove
 % violations of up to 0.52 rad; limits + reuse of 5 samples: every scene 5/5 with fewer
 % iterations than limits alone (T4 S3 147 -> 85); noise decay ALONE made T4 S1/S3 fail

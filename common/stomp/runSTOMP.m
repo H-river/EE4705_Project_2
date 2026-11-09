@@ -9,13 +9,13 @@ function result = runSTOMP(model, q0, qT, voxel_world, cfg)
 %   .iterTime         wall time per iteration [s]
 %   .nIter, .totalTime
 %
-% Extensions of the original algorithm (all switched by cfg, see defaultConfig; with
-% shortestAngleInit = false, enforceJointLimits = false, nReuse = 0, noiseDecay = 1 the
-% loop is exactly the original STOMP):
+% Extensions of the original algorithm (all switched by cfg, see defaultConfig). With
+% shortestAngleInit = false, enforceJointLimits = false, nReuse = 0, noiseDecay = 1 and
+% convergencePatience = 1 the loop is the original STOMP:
 %   * cfg.shortestAngleInit  : continuous joints interpolated along the shortest angle
 %   * cfg.enforceJointLimits : noisy samples and the updated trajectory are projected into
 %                              the joint limits (original STOMP ignores them, so planned
-%                              Panda trajectories left the limits by up to 0.35 rad)
+%                              Panda trajectories left the limits by up to 0.52 rad)
 %   * cfg.nReuse             : the nReuse cheapest samples of the previous iteration join
 %                              the current ones (their costs are known -> no extra FK)
 %   * cfg.noiseDecay, cfg.noiseMinScale : exploration covariance scaled by

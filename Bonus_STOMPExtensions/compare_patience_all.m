@@ -4,7 +4,7 @@
 % PoE FK everywhere (identical to getTransform to ~1e-15, ~13x faster).
 
 clear; clc; close all;
-root = fileparts(fileparts(mfilename('fullpath')));          % this file lives in tools/
+root = fileparts(fileparts(mfilename('fullpath')));          % this file lives in Bonus_STOMPExtensions/
 addpath(genpath(fullfile(root, 'common')));
 
 seeds    = 0:4;      % 5 runs per scene and P
@@ -63,7 +63,7 @@ summary = table(sc, pp, splitapply(@mean, raw.collisionFree, g), splitapply(@med
     'VariableNames', {'scene', 'P', 'successRate', 'medIters', 'runsAtMaxIter', ...
     'medObstacleCost', 'medClearance_cm', 'medTime_s'});
 disp(summary)
-outDir = fullfile(root, 'tools', 'patience_results');  if ~exist(outDir, 'dir'), mkdir(outDir); end
+outDir = fullfile(root, 'Bonus_STOMPExtensions', 'results');  if ~exist(outDir, 'dir'), mkdir(outDir); end
 writetable(raw,     fullfile(outDir, 'patience_runs.csv'));
 writetable(summary, fullfile(outDir, 'patience_summary.csv'));
 

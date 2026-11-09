@@ -15,13 +15,14 @@ Each task has one entry script. Open it and press **Run** — it adds `common/` 
 
 | Task | Entry script | What it shows | FK |
 |---|---|---|---|
-| 1 | `Task1_Kinova/main_task1.m` | Kinova Gen3, original scenario, animation | `getTransform` |
+| 1 | `Task1_Kinova/main_task1.m` | Kinova Gen3, original scenario, animation. Replaces the provided `KINOVA_STOMP_Path_Planning.m`; the provided, incomplete files are kept unmodified in `original_code/` and are not meant to be run | `getTransform` |
 | 2 | `Task2_NewRobot/main_task2.m` | Franka Emika Panda (`common/config/robotConfig.m`) in a Task-1-like scene; collision-sphere radii fitted to the meshes + coverage plot | `getTransform` |
 | 3 | `Task3_PoE/main_task3.m` | Screw-axis table + figure, PoE accuracy/speed vs `getTransform` (`compareFK.m`), same-seed planning with both | PoE vs `getTransform` |
 | 4 | `Task4_Scenarios/main_task4.m` | Three custom multi-obstacle scenarios + 10-seed robustness study | PoE |
 | 5 | `Task5_EEConstraint/main_task5.m` | EE y-axis kept upright: weight sweep, then with vs. without constraint | PoE |
-| Bonus | `Bonus_STOMPExtensions/main_bonus.m` | Joint-angle wrap demo (Kinova) + ablation of the STOMP extensions on all scenes (~15 min) | PoE |
+| Bonus | `Bonus_STOMPExtensions/main_bonus.m` | Joint-angle wrap demo (Kinova) + ablation of the STOMP extensions on all scenes + convergence patience P = 1 vs P = 3 (~15 min) | PoE |
 | Videos | `Videos/make_videos.m` | MP4 videos for the presentation from the saved results (run the tasks first) | PoE |
+| GUI | `GUI/stomp_gui.m` | Interactive front end: choose a scenario and the planner options, plan, watch the result, rotate the view with the mouse | PoE or `getTransform` |
 
 Outputs (`.mat`, figures, `.csv` tables, optional videos) go to each task's `results/` folder,
 which is created on the first run. All runs are seeded (`rng`), so they are reproducible.
@@ -96,7 +97,7 @@ Additional features:
   it 5.6 rad the long way round (EE path 3.3 m), the shortest-angle line 0.68 rad (0.85 m).
 - **PoE forward kinematics** (`computeScrewAxes`, `fkPoE`): screw axes computed once at the
   zero configuration; one running product with closed-form Rodrigues exponentials gives all
-  frames. Same result as `getTransform` to ~1e-15, FK ~35x faster, STOMP iteration ~13x faster;
+  frames. Same result as `getTransform` to ~1e-15, FK 30-40x faster, STOMP iteration ~13x faster;
   screw axes cross-checked with the matrix logarithm.
 - **Multi-obstacle voxelisation**: boxes (optionally rotated), spheres and upright cylinders.
 - **Ground-truth collision check** with the robot meshes, independent of the sphere model
@@ -113,13 +114,16 @@ Additional features:
 - **Robustness studies**: Task 4 runs each scenario with 10 seeds; Task 5 sweeps the
   constraint weight over 5 seeds per weight and picks it automatically.
 - **Convergence patience** (`cfg.convergencePatience`): stop only after several consecutive
-  small cost changes instead of the first one.
+  small cost changes instead of the first one; P = 1 (the original rule) vs P = 3 on every
+  scene in `Bonus_STOMPExtensions/compare_patience_all.m`.
+- **GUI** (`GUI/stomp_gui.m`): choose a scenario, FK method, planner extensions, seed and
+  constraint weight, then plan and watch the result; view presets and mouse rotation.
 
 ## Team
 | Member | Tasks |
 |---|---|
-| Joshua Lim | Task 1, Task 2, framework, README, clean-environment reproduction check |
-| Hu Jiamo | Task 3 (PoE), Task 4 (scenarios, multi-obstacle voxelisation) |
+| Joshua Lim | Task 1, Task 2, framework, convergence-patience evaluation, README, clean-environment reproduction check |
+| Hu Jiamo | Task 3 (PoE), Task 4 (scenarios, multi-obstacle voxelisation), STOMP extensions, GUI, videos |
 | Dexter | Task 5, shared plotting functions, report and slides integration |
 
 ## Reference
